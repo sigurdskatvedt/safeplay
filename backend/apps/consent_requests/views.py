@@ -23,7 +23,7 @@ class HelpRequestViewSet(viewsets.ModelViewSet):
 
         if self.request.user.is_staff:
             return HelpRequest.objects.all()
-        elif self.request.user.is_volunteer:
+        elif self.request.user.is_manager:
             approved = []
             for c in Competence:
                 if CertificationRequest.IsCertified(self.request.user, c):

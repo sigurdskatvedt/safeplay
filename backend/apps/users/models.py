@@ -6,12 +6,15 @@ from .validators import FileValidator
 
 import django.utils.timezone
 
+
 class User(AbstractUser):
     """ Overide user model to be able to add custom fields"""
 
-    # Is the user a volunteer or a refugee
-    is_volunteer = models.BooleanField(default=False)
-    verify_email_timer = models.DateTimeField(default=django.utils.timezone.now, blank=True, null=True, verbose_name='verify email timer')
+    is_manager = models.BooleanField(default=False)
+    birthdate = models.DateField(
+        blank=True, null=True, verbose_name='Birthdate')
+    verify_email_timer = models.DateTimeField(
+        default=django.utils.timezone.now, blank=True, null=True, verbose_name='verify email timer')
     login_attempts = models.IntegerField(default=0)
     login_timeout = models.DateTimeField(auto_now_add=True)
 
