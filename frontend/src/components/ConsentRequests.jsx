@@ -3,11 +3,11 @@ import AddIcon from "@mui/icons-material/Add";
 import MuiAlert from "@mui/material/Alert";
 import React, { useState, useEffect } from "react";
 import HelpRequestService from "../services/helpRequests";
-import HelpRequest from "./HelpRequest";
-import NewHelpRequest from "./NewHelpRequest";
+import Request from "./Request";
+import NewRequest from "./NewRequest";
 import Modal from "@mui/material/Modal";
 
-const HelpRequests = ({ user }) => {
+const ConsentRequests = ({ user }) => {
   const [requests, setRequests] = useState([]);
 
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -49,7 +49,7 @@ const HelpRequests = ({ user }) => {
   return (
     <Container>
       <Typography sx={{ textAlign: "center", marginTop: 3 }} variant='h2'>
-        Help Requests
+        Consent Requests
       </Typography>
 
       {user === null ? (
@@ -91,26 +91,7 @@ const HelpRequests = ({ user }) => {
               ?.filter((r) => r.volunteer === null && !r.finished)
               .map((r) => (
                 <Grid item xs={12} sm={6} md={4} lg={3} xl={3} key={r.id}>
-                  <HelpRequest
-                    user={user}
-                    helpRequest={r}
-                    update={Update}
-                    OpenSnackbar={OpenSnackbar}
-                  />
-                </Grid>
-              ))}
-          </Grid>
-
-          <Typography sx={{ textAlign: "center", marginTop: 3 }} variant='h4'>
-            Active Requests
-          </Typography>
-
-          <Grid container padding={2} spacing={5} justifyContent='center'>
-            {requests
-              ?.filter((r) => r.volunteer !== null && !r.finished)
-              .map((r) => (
-                <Grid item xs={12} sm={6} md={4} lg={3} xl={3} key={r.id}>
-                  <HelpRequest
+                  <Request
                     user={user}
                     helpRequest={r}
                     update={Update}
@@ -129,7 +110,7 @@ const HelpRequests = ({ user }) => {
               ?.filter((r) => r.finished)
               .map((r) => (
                 <Grid item xs={12} sm={6} md={4} lg={3} xl={3} key={r.id}>
-                  <HelpRequest
+                  <Request
                     user={user}
                     helpRequest={r}
                     update={Update}
@@ -155,12 +136,12 @@ const HelpRequests = ({ user }) => {
       )}
 
       <Modal open={open} onClose={handleModalClose}>
-        <NewHelpRequest
+        <NewRequest
           OpenSnackbar={OpenSnackbar}
           handleClose={handleModalClose}
           setOpen={setOpen}
           update={Update}
-        ></NewHelpRequest>
+        ></NewRequest>
       </Modal>
 
       <Snackbar
@@ -177,4 +158,4 @@ const HelpRequests = ({ user }) => {
   );
 };
 
-export default HelpRequests;
+export default ConsentRequests;

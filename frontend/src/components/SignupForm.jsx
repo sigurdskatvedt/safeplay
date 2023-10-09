@@ -18,6 +18,11 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import IconButton from "@mui/material/IconButton";
+import AddIcon from '@mui/icons-material/Add';
+import Box from "@mui/material/Box";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />;
@@ -32,8 +37,63 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
   const [password, setPassword] = useState("");
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarText, setSnackbarText] = useState("");
-  const [accountType, setAccountType] = React.useState("volunteer");
+  const [snackbarType, setSnackbarType] = useState("success");
+  const [accountType, setAccountType] = React.useState("player");
+  const [birthdate, setBirthdate] = React.useState(new Date().toISOString().split('T')[0]);
   const [open, setOpen] = useState(false);
+  const [currentTeam, setCurrentTeam] = useState("");
+  const [teams, setTeams] = useState([{ id: 1, name: "Team Alpha" },
+  { id: 2, name: "Team Beta" },
+  { id: 3, name: "Team Gamma" }]);
+  const [isTeamDialogOpen, setIsTeamDialogOpen] = useState(false);
+  const [newTeamName, setNewTeamName] = useState('');
+
+  const handleAddTeam = () => {
+    // TODO: Something like this:
+    /* AuthService.createTeam(newTeamName)
+      .then((response) => {
+        // Update the local teams array if necessary
+        setTeams(prevTeams => [...prevTeams, { id: response.data.id, name: newTeamName }]);
+
+        setSnackbarText("Team created successfully!");
+        setSnackbarOpen(true);
+        setNewTeamName('');
+        handleCloseTeamDialog();
+      })
+      .catch((err) => {
+        setSnackbarText("Failed to create team.");
+        setSnackbarOpen(true);
+      }); */
+
+    // Here, you can add logic to send the new team data to a server, add to an array, etc.
+    mockApiCreateTeam(newTeamName)
+      .then((response) => {
+        // Update the local teams array with the new team
+        setTeams(prevTeams => [...prevTeams, response.data]);
+
+        // Set the currentTeam to the new team's id
+        setCurrentTeam(response.data.id);
+
+        setSnackbarText("Team created successfully!");
+        setSnackbarType("success");
+        setSnackbarOpen(true);
+        setNewTeamName('');
+        handleCloseTeamDialog();
+      })
+      .catch((err) => {
+        // Since our mock API always succeeds, this code won't run.
+        // But it's here for completeness.
+        setSnackbarText("Failed to create team.");
+        setSnackbarType("error");
+        setSnackbarOpen(true);
+      });
+    // Example: add to the teams array (this is a local operation; typically you might send this data to a server)
+    setTeams([...teams, { id: teams.length + 1, name: newTeamName }]);
+
+    // Clear the new team name and close the dialog
+    setNewTeamName('');
+    handleCloseTeamDialog();
+  };
 
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -54,23 +114,55 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
     setAccountType(event.target.value);
   };
 
+  const handleChangeAccountBirth = (event) => {
+    setBirthdate(event.target.value.toISOString().split('T')[0]);
+  };
+
+  const handleTeamChange = (event) => {
+    setCurrentTeam(event.target.value);
+  };
+
+  const handleOpenTeamDialog = () => {
+    setIsTeamDialogOpen(true);
+  };
+
+  const handleCloseTeamDialog = () => {
+    setIsTeamDialogOpen(false);
+  };
+
+  const mockApiCreateTeam = (teamName) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({
+          data: {
+            id: Math.random(),  // Simulating an ID from a backend
+            name: teamName
+          }
+        });
+      }, 1000);  // Simulating a 1-second API call delay
+    });
+  };
+
+
   const onSubmit = (e) => {
     e.preventDefault();
 
-    const is_volunteer = accountType === "volunteer";
+    const is_manager = accountType === "manager";
     const request = {
       username: username,
       email: email,
       password: password,
-      is_volunteer: is_volunteer,
+      is_manager: is_manager,
+      birthdate: birthdate,
     };
     AuthService.createUser(request)
       .then((response) => {
         console.log("User registered successfully");
-        setAppSnackbarText(
-          "If the email exist, an activation link has been sent."
+        setSnackbarText(
+          "If the email exists, an activation link has been sent."
         );
-        setAppSnackbarOpen(true);
+        setSnackbarType("success");
+        setSnackbarOpen(true);
         setUsername("");
         setEmail("");
         setPassword("");
@@ -84,6 +176,7 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
           msg = "Failed to get response from server.";
         }
         setSnackbarText(msg);
+        setSnackbarType("error");
         setSnackbarOpen(true);
       });
   };
@@ -105,8 +198,8 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
       })
       .catch((err) => {
         console.log("New link request failed");
-    });
-  };  
+      });
+  };
 
   return (
     <>
@@ -127,17 +220,76 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
                 onChange={handleChangeAccountType}
               >
                 <FormControlLabel
-                  value='volunteer'
+                  value='player'
                   control={<Radio />}
-                  label='Volunteer'
+                  label='Player'
                 />
                 <FormControlLabel
-                  value='refugee'
+                  value='manager'
                   control={<Radio />}
-                  label='Refugee'
+                  label='Manager'
                 />
               </RadioGroup>
             </FormControl>
+            <FormControl>
+              <FormLabel>Team</FormLabel>
+              <Box display="flex" alignItems="center">
+                <Select
+                  value={currentTeam}
+                  onChange={handleTeamChange}
+                  fullWidth
+                  style={{ flexGrow: 1 }} // makes the Select take as much width as possible
+                >
+                  {teams.map((teamItem) => (
+                    <MenuItem key={teamItem.id} value={teamItem.id}>
+                      {teamItem.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+                {accountType === "manager" && (
+                  <>
+                    <IconButton onClick={handleOpenTeamDialog} size="small">
+                      <AddIcon />
+                    </IconButton>
+                    <Dialog open={isTeamDialogOpen} onClose={handleCloseTeamDialog}>
+                      <DialogTitle>Create a New Team</DialogTitle>
+                      <DialogContent>
+                        <DialogContentText>
+                          Please enter the name for the new team.
+                        </DialogContentText>
+                        <TextField
+                          autoFocus
+                          margin='dense'
+                          id='teamName'
+                          label='Team Name'
+                          value={newTeamName}
+                          onChange={(e) => setNewTeamName(e.target.value)}
+                          fullWidth
+                          variant='standard'
+                          required
+                        />
+                      </DialogContent>
+                      <DialogActions>
+                        <Button onClick={handleCloseTeamDialog} color="primary">
+                          Cancel
+                        </Button>
+                        <Button onClick={handleAddTeam} color="primary">
+                          Add
+                        </Button>
+                      </DialogActions>
+                    </Dialog>
+                  </>
+                )}
+              </Box>
+            </FormControl>
+            <TextField
+              label="Birthday"
+              type="date"
+              onChange={handleChangeAccountBirth}
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
             <TextField
               required
               label='Username'
@@ -184,7 +336,7 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
           autoHideDuration={5000}
           onClose={handleClose}
         >
-          <Alert onClose={handleClose} severity='error' sx={{ width: "100%" }}>
+          <Alert onClose={handleClose} severity={snackbarType} sx={{ width: "100%" }}>
             {snackbarText}
           </Alert>
         </Snackbar>

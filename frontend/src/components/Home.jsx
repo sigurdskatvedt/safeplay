@@ -16,7 +16,7 @@ const Home = ({ setUser }) => {
       if (user.is_staff) {
         navigate("/approve-certifications");
       } else {
-        navigate("/help-requests");
+        navigate("/consent-requests");
       }
     }
   }, [navigate, setUser]);
@@ -30,18 +30,17 @@ const Home = ({ setUser }) => {
         alignItems='center'
       >
         <Typography sx={{ textAlign: "center" }} variant='h4'>
-          Welcome to SecureHelp, the best application for securely managing
-          voluntary work.
+          Welcome to Safeplay, the most secure platform for streaming your 
+    football matches.
         </Typography>
         <img
           alt='logo'
           align='center'
           src='logo512primary.png'
-          width='300'
-          height='300'
+          height='300vh'
         />
         <Typography sx={{ textAlign: "center" }} variant='body'>
-          Register for voluntary work or as a refugee here!
+          Register as player or a manager here!
         </Typography>
         <Button onClick={() => navigate("/signup")} variant='contained'>
           Click here to sign up

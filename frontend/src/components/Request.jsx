@@ -11,7 +11,7 @@ import React, { useState } from "react";
 import HelpRequestService from "../services/helpRequests";
 import DocumentService from "../services/documents";
 
-const HelpRequest = ({ helpRequest, update, OpenSnackbar, user }) => {
+const Request = ({ helpRequest, update, OpenSnackbar, user }) => {
   const [anchorEl, setAnchorEl] = useState(null);
 
   const [documents, setDocuments] = useState([]);
@@ -185,4 +185,4 @@ const HelpRequest = ({ helpRequest, update, OpenSnackbar, user }) => {
   );
 };
 
-export default HelpRequest;
+export default Request;

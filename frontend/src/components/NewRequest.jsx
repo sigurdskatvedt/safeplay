@@ -9,7 +9,8 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import HelpRequestService from "../services/helpRequests";
 import { Typography } from "@mui/material";
-const NewHelpRequest = React.forwardRef((props, ref) => {
+
+const NewRequest = React.forwardRef((props, ref) => {
   const ServiceTypes = ["MEDICAL", "TRANSPORT", "FOOD", "SHELTER"];
 
   const [serviceType, setServiceType] = useState("");
@@ -105,4 +106,4 @@ const NewHelpRequest = React.forwardRef((props, ref) => {
   );
 });
 
-export default NewHelpRequest;
+export default NewRequest;

@@ -91,7 +91,7 @@ const LoginForm = ({ setUser, setAppSnackbarOpen, setAppSnackbarText }) => {
         if (response.user.is_staff) {
           navigate("/approve-certifications");
         } else {
-          navigate("/help-requests");
+          navigate("/consent-requests");
         }
         setAppSnackbarText("Signed in successfully");
         setAppSnackbarOpen(true);

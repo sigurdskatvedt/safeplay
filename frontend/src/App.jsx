@@ -11,13 +11,13 @@ import Avatar from "@mui/material/Avatar";
 import LoginForm from "./components/LoginForm";
 import Home from "./components/Home";
 import SignupForm from "./components/SignupForm";
-import Certifications from "./components/Certifications";
-import ApproveCerts from "./components/ApproveCerts";
-import HelpRequests from "./components/HelpRequests";
+import Matches from "./components/Matches";
+import CreateMatch from "./components/CreateMatch";
+import ConsentRequests from "./components/ConsentRequests";
 import ResetPassword from "./components/ResetPassword";
 import Verified from "./components/Verified";
 import Invalid from "./components/Invalid";
-import Documents from "./components/Documents";
+import Object from "./components/Object";
 import AuthService from "./services/auth";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
@@ -59,32 +59,32 @@ const App = () => {
                 <Avatar alt='Home' src='favicon.ico' />
               </Button>
             </Grid>
-            {user?.is_volunteer ? (
+            {user?.is_manager ? (
               <Grid item marginTop={0.8}>
-                <Button color='inherit' component={Link} to='/certifications'>
-                  Certifications
-                </Button>
-              </Grid>
-            ) : null}
-            {user?.is_staff ? (
-              <Grid item marginTop={0.8}>
-                <Button
-                  color='inherit'
-                  component={Link}
-                  to='/approve-certifications'
-                >
-                  Certification Requests
+                <Button color='inherit' component={Link} to='/matches'>
+                  Overview
                 </Button>
               </Grid>
             ) : null}
 
-            {user && !user?.is_staff ? (
+            {user?.is_manager ? (
               <Grid item marginTop={0.8}>
-                <Button color='inherit' component={Link} to='/help-requests'>
-                  Help Requests
+                <Button color='inherit' component={Link} to='/creatematch'>
+                  Create New Match
                 </Button>
-                <Button color='inherit' component={Link} to='/documents'>
-                  Documents
+              </Grid>
+            ) : null}
+            {user?.id ? (
+              <Grid item marginTop={0.8}>
+                <Button color='inherit' component={Link} to='/object'>
+                  Object
+                </Button>
+              </Grid>
+            ) : null}
+            {user?.id ? (
+              <Grid item marginTop={0.8}>
+                <Button color='inherit' component={Link} to='/consent-requests'>
+                  Consent Requests
                 </Button>
               </Grid>
             ) : null}
@@ -122,11 +122,14 @@ const App = () => {
       <Container maxWidth='xl'>
         <Routes>
           <Route
-            path='/certifications'
-            element={<Certifications user={user} />}
+            path='/matches'
+            element={<Matches user={user} />}
           />
-          <Route path='/approve-certifications' element={<ApproveCerts />} />
-          <Route path='/help-requests' element={<HelpRequests user={user} />} />
+          <Route
+            path='/creatematch'
+            element={<CreateMatch user={user} />}
+          />
+          <Route path='/consent-requests' element={<ConsentRequests user={user} />} />
 
           <Route
             path='login'
@@ -154,7 +157,7 @@ const App = () => {
 
           <Route path='/new_password' element={<ResetPassword />} />
 
-          <Route path='/documents' element={<Documents />} />
+          <Route path='/object' element={<Object />} />
 
           <Route path='/' element={<Home setUser={setUser} />} />
         </Routes>
