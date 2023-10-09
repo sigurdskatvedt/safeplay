@@ -40,7 +40,7 @@ const Home = ({ setUser }) => {
           height='300vh'
         />
         <Typography sx={{ textAlign: "center" }} variant='body'>
-          Register as player or a manager here!
+          Register as player or a manager below:
         </Typography>
         <Button onClick={() => navigate("/signup")} variant='contained'>
           Click here to sign up

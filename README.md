@@ -1,6 +1,6 @@
-# SecureHelp
-
-Security application for TDT4237 Spring 2023. Make sure to read this whole file before starting to work with the application. This document contains the following instructions:
+# SafePlay
+Security application for TDT4237 Spring 2024.
+<!-- Security application for TDT4237 Spring 2023. Make sure to read this whole file before starting to work with the application. This document contains the following instructions:
 
 - Prerequisites
 - Gitlab authentication
@@ -149,4 +149,4 @@ The instance will be running at http://localhost:3000/ and code changes should u
 ## Assumptions
 
 - The .env file is assumed to be an external file, and would not be part of this repository for a real project. Having passwords in a file on the hosted repository is considered a security risk.
-
+-->
