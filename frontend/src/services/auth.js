@@ -13,6 +13,12 @@ const createUser = (credentials) => {
   });
 };
 
+const createTeam = (teamName) => {
+  return api.post(`/teams/`, { name: teamName }).then((response) => {
+    return response.data;
+  });
+};
+
 const login = (credentials) => {
   return api.post("/login/", credentials).then((response) => {
     if (response.data.access) {
@@ -63,6 +69,7 @@ const AuthService = {
   logout,
   getCurrentUser,
   sendNewEmail,
+  createTeam,
 };
 
 export default AuthService;

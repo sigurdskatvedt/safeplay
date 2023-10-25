@@ -21,4 +21,5 @@ urlpatterns = [
     path('', include('apps.users.urls')),
     path('', include('apps.certifications.urls')),
     path('', include('apps.help_requests.urls')),
+    path('api/', include('apps.teams.urls')),
 ]

@@ -75,10 +75,13 @@ class RegisterSerializer(UserSerializer):
         max_length=128, min_length=1, write_only=True, required=True)
     email = serializers.CharField(
         max_length=128, min_length=1,  required=True)
+    team_name = serializers.CharField(write_only=True, required=False)
+
 
     class Meta:
         model = get_user_model()
-        fields = ['id', 'username', 'email', 'password', 'is_manager']
+        fields = ['id', 'username', 'email',
+                  'password', 'is_manager', 'team_name']
 
     def create(self, validated_data):
         user = get_user_model().objects.create_user(**validated_data)

@@ -1,6 +1,7 @@
 from django.db import models
 
 from django.contrib.auth.models import AbstractUser
+from apps.teams.models import Team
 
 from .validators import FileValidator
 
@@ -17,6 +18,8 @@ class User(AbstractUser):
         default=django.utils.timezone.now, blank=True, null=True, verbose_name='verify email timer')
     login_attempts = models.IntegerField(default=0)
     login_timeout = models.DateTimeField(auto_now_add=True)
+    team = models.ForeignKey(
+        Team, on_delete=models.SET_NULL, blank=True, null=True, related_name='members')
 
 
 def document_directory_path(instance, filename):

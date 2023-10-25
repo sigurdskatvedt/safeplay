@@ -42,37 +42,22 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
   const [birthdate, setBirthdate] = React.useState(new Date().toISOString().split('T')[0]);
   const [open, setOpen] = useState(false);
   const [currentTeam, setCurrentTeam] = useState("");
-  const [teams, setTeams] = useState([{ id: 1, name: "Team Alpha" },
-  { id: 2, name: "Team Beta" },
-  { id: 3, name: "Team Gamma" }]);
+  const [teams, setTeams] = useState([]);
   const [isTeamDialogOpen, setIsTeamDialogOpen] = useState(false);
   const [newTeamName, setNewTeamName] = useState('');
 
   const handleAddTeam = () => {
-    // TODO: Something like this:
-    /* AuthService.createTeam(newTeamName)
-      .then((response) => {
-        // Update the local teams array if necessary
-        setTeams(prevTeams => [...prevTeams, { id: response.data.id, name: newTeamName }]);
+    const request = newTeamName;
 
-        setSnackbarText("Team created successfully!");
-        setSnackbarOpen(true);
-        setNewTeamName('');
-        handleCloseTeamDialog();
-      })
-      .catch((err) => {
-        setSnackbarText("Failed to create team.");
-        setSnackbarOpen(true);
-      }); */
-
-    // Here, you can add logic to send the new team data to a server, add to an array, etc.
-    mockApiCreateTeam(newTeamName)
+    AuthService.createTeam(request)
       .then((response) => {
+        console.log(response);
         // Update the local teams array with the new team
-        setTeams(prevTeams => [...prevTeams, response.data]);
+        setTeams(prevTeams => [...prevTeams, response]);
+        console.log(teams);
 
         // Set the currentTeam to the new team's id
-        setCurrentTeam(response.data.id);
+        setCurrentTeam(response.id);
 
         setSnackbarText("Team created successfully!");
         setSnackbarType("success");
@@ -86,13 +71,13 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
         setSnackbarText("Failed to create team.");
         setSnackbarType("error");
         setSnackbarOpen(true);
+        console.log(err);
       });
-    // Example: add to the teams array (this is a local operation; typically you might send this data to a server)
-    setTeams([...teams, { id: teams.length + 1, name: newTeamName }]);
 
     // Clear the new team name and close the dialog
     setNewTeamName('');
     handleCloseTeamDialog();
+    console.log(teams);
   };
 
   const handleClose = (event, reason) => {
@@ -128,19 +113,6 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
 
   const handleCloseTeamDialog = () => {
     setIsTeamDialogOpen(false);
-  };
-
-  const mockApiCreateTeam = (teamName) => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          data: {
-            id: Math.random(),  // Simulating an ID from a backend
-            name: teamName
-          }
-        });
-      }, 1000);  // Simulating a 1-second API call delay
-    });
   };
 
 
