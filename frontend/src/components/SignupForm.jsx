@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
@@ -45,6 +45,19 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
   const [teams, setTeams] = useState([]);
   const [isTeamDialogOpen, setIsTeamDialogOpen] = useState(false);
   const [newTeamName, setNewTeamName] = useState('');
+
+  useEffect(() => {
+    console.log("running");
+    // Make an API call to fetch teams
+    AuthService.fetchTeams()
+      .then(response => {
+        setTeams(response);
+        console.log(teams);
+      })
+      .catch(error => {
+        console.error("Error fetching teams:", error);
+      });
+  }, []);
 
   const handleAddTeam = () => {
     const request = newTeamName;
@@ -100,7 +113,7 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
   };
 
   const handleChangeAccountBirth = (event) => {
-    setBirthdate(event.target.value.toISOString().split('T')[0]);
+    setBirthdate(event.target.value.split('T')[0]);
   };
 
   const handleTeamChange = (event) => {
@@ -210,7 +223,7 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
                   value={currentTeam}
                   onChange={handleTeamChange}
                   fullWidth
-                  style={{ flexGrow: 1 }} // makes the Select take as much width as possible
+                  style={{ flexGrow: 1 }}
                 >
                   {teams.map((teamItem) => (
                     <MenuItem key={teamItem.id} value={teamItem.id}>

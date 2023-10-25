@@ -19,6 +19,12 @@ const createTeam = (teamName) => {
   });
 };
 
+const fetchTeams = () => {
+  return api.get(`/teams/`).then((response) => {
+    return response.data;
+  });
+};
+
 const login = (credentials) => {
   return api.post("/login/", credentials).then((response) => {
     if (response.data.access) {
@@ -70,6 +76,7 @@ const AuthService = {
   getCurrentUser,
   sendNewEmail,
   createTeam,
+  fetchTeams,
 };
 
 export default AuthService;
