@@ -139,6 +139,7 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
       password: password,
       is_manager: is_manager,
       birthdate: birthdate,
+      team_id: currentTeam,
     };
     AuthService.createUser(request)
       .then((response) => {

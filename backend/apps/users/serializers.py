@@ -11,7 +11,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from django.conf import settings
-from .models import User, Document
+from .models import User, Document, Team
 from rest_framework.exceptions import AuthenticationFailed
 from django.utils.encoding import force_bytes, force_str
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
@@ -22,7 +22,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = get_user_model()
-        fields = ['id', 'username', 'email', 'is_manager', 'is_staff']
+        fields = ['id', 'username', 'email', 'is_manager', 'is_staff', 'team_id']
         read_only_fields = ['id']
 
 
@@ -75,19 +75,25 @@ class RegisterSerializer(UserSerializer):
         max_length=128, min_length=1, write_only=True, required=True)
     email = serializers.CharField(
         max_length=128, min_length=1,  required=True)
-    team_name = serializers.CharField(write_only=True, required=False)
+    team_id = serializers.IntegerField(write_only=True, required=False)
 
 
     class Meta:
         model = get_user_model()
         fields = ['id', 'username', 'email',
-                  'password', 'is_manager', 'team_name']
+                  'password', 'is_manager', 'team_id']
 
     def create(self, validated_data):
+        team_id = validated_data.pop('team_id', None)
         user = get_user_model().objects.create_user(**validated_data)
 
         user.is_active = False  # set user to inactive until email is verified
         user.save()
+
+        if team_id:
+            team = Team.objects.get(id=team_id)
+            user.team = team
+            user.save()
 
         # create email to send to user
         email = validated_data["email"]
