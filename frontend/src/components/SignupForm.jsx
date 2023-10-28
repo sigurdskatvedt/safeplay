@@ -47,7 +47,6 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
   const [newTeamName, setNewTeamName] = useState('');
 
   useEffect(() => {
-    console.log("running");
     // Make an API call to fetch teams
     AuthService.fetchTeams()
       .then(response => {
@@ -57,7 +56,7 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
       .catch(error => {
         console.error("Error fetching teams:", error);
       });
-  }, []);
+  }, [teams]);
 
   const handleAddTeam = () => {
     const request = newTeamName;

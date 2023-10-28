@@ -84,7 +84,7 @@ INSTALLED_APPS = [
     'apps.users',
     'apps.teams',
     'apps.certifications',
-    'apps.help_requests'
+    'apps.matches',
 ]
 
 MIDDLEWARE = [

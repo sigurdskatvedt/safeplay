@@ -19,7 +19,7 @@ from .models import Document
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.http import HttpResponse, HttpResponseNotFound
 from django.core.exceptions import PermissionDenied
-from apps.help_requests.models import HelpRequest
+#from apps.help_requests.models import HelpRequest
 from .permissions import DocumentPermission
 from datetime import datetime, timedelta, timezone
 
@@ -243,43 +243,43 @@ class DocumentViewSet(viewsets.ModelViewSet):
         return Document.objects.filter(user=self.request.user)
 
 
-class GetDocumentsForRefugeeView(generics.GenericAPIView):
-    """View for getting documents for a refugee, if the user is a volunteer for the refugee"""
-    serializer_class = DocumentGetSerializer
+# class GetDocumentsForRefugeeView(generics.GenericAPIView):
+#     """View for getting documents for a refugee, if the user is a volunteer for the refugee"""
+#     serializer_class = DocumentGetSerializer
+#
+#     def get(self, request, refugee_username):
+#
+#         user = request.user
+#         refugee = get_user_model().objects.filter(username=refugee_username).first()
+#         if refugee:
+#             requests = HelpRequest.objects.filter(volunteer=user)
+#             # Check if the user is a volunteer for the refugee
+#             if requests.filter(refugee=refugee).exists():
+#                 documents = Document.objects.filter(user=refugee)
+#                 serializer = self.serializer_class(
+#                     documents, many=True, context={'request': request})
+#                 return Response(serializer.data, status=status.HTTP_200_OK)
+#         return Response(status=status.HTTP_403_FORBIDDEN)
 
-    def get(self, request, refugee_username):
 
-        user = request.user
-        refugee = get_user_model().objects.filter(username=refugee_username).first()
-        if refugee:
-            requests = HelpRequest.objects.filter(volunteer=user)
-            # Check if the user is a volunteer for the refugee
-            if requests.filter(refugee=refugee).exists():
-                documents = Document.objects.filter(user=refugee)
-                serializer = self.serializer_class(
-                    documents, many=True, context={'request': request})
-                return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_403_FORBIDDEN)
-
-
-class DocumentDownloadView(generics.GenericAPIView):
-    """View for downloading a document"""
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get(self, request, pk):
-        try:
-            document = Document.objects.get(pk=pk)
-        except:
-            return HttpResponseNotFound('<h1>File not found :(</h1>')
-        user = request.user
-        owner = document.user
-        requests = HelpRequest.objects.filter(volunteer=user)
-        refugees = map(lambda x: x.refugee, requests)
-        # Check if the user is the owner of the document or a volunteer for the refugee
-        if user == owner or owner in refugees or user.is_staff:
-            response = HttpResponse(
-                document.document, content_type=document.content_type)
-            return response
-        else:
-            raise PermissionDenied(
-                {"Message": "You do not have permission to access this file."})
+# class DocumentDownloadView(generics.GenericAPIView):
+#     """View for downloading a document"""
+#     permission_classes = [permissions.IsAuthenticated]
+#
+#     def get(self, request, pk):
+#         try:
+#             document = Document.objects.get(pk=pk)
+#         except:
+#             return HttpResponseNotFound('<h1>File not found :(</h1>')
+#         user = request.user
+#         owner = document.user
+#         requests = HelpRequest.objects.filter(volunteer=user)
+#         refugees = map(lambda x: x.refugee, requests)
+#         # Check if the user is the owner of the document or a volunteer for the refugee
+#         if user == owner or owner in refugees or user.is_staff:
+#             response = HttpResponse(
+#                 document.document, content_type=document.content_type)
+#             return response
+#         else:
+#             raise PermissionDenied(
+#                 {"Message": "You do not have permission to access this file."})

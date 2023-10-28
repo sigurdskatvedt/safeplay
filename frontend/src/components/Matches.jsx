@@ -10,12 +10,20 @@ import {
   TableRow,
   Paper,
 } from "@mui/material";
+import MatchesService from "../services/matches"; // Import the MatchesService
 
 const Matches = () => {
   const [upcomingMatches, setUpcomingMatches] = useState([]);
   const [finishedMatches, setFinishedMatches] = useState([]);
 
-  const fetchMatches = () => {
+  const fetchMatches = async () => {
+    try {
+      const matchesData = await MatchesService.GetMatches();
+      console.log(matchesData); // Log the fetched matches data
+      // Process and set the matches data to state as per your requirements
+    } catch (error) {
+      console.error("Error fetching matches:", error);
+    }
     // Replace this mock data with an API call to get actual matches data
     const mockUpcomingMatches = [
       {
