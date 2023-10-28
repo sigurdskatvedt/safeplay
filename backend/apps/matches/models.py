@@ -2,6 +2,7 @@ from django.db import models
 
 from django.db import models
 from apps.teams.models import Team
+from apps.consent_requests.models import ConsentRequest
 
 class Match(models.Model):
     team1 = models.ForeignKey(Team, related_name='home_matches', on_delete=models.CASCADE)

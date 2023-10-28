@@ -85,6 +85,7 @@ INSTALLED_APPS = [
     'apps.teams',
     'apps.certifications',
     'apps.matches',
+    'apps.consent_requests',
 ]
 
 MIDDLEWARE = [
