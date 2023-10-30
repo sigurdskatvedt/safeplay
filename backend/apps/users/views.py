@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from rest_framework import permissions, viewsets, status, generics
-from apps.users.serializers import *
+from apps.users.serializers import UserSerializer, RegisterSerializer, ResetPasswordSerializer, LoginSerializer, SendNewEmailSerializer,  SetNewPasswordSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -19,7 +19,6 @@ from .models import Document
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.http import HttpResponse, HttpResponseNotFound
 from django.core.exceptions import PermissionDenied
-#from apps.help_requests.models import HelpRequest
 from .permissions import DocumentPermission
 from datetime import datetime, timedelta, timezone
 

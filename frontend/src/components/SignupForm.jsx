@@ -31,6 +31,8 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [emailUsername, setEmailUsername] = useState("");
   const [sendEmail, setSendEmail] = useState("");
@@ -51,12 +53,11 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
     AuthService.fetchTeams()
       .then(response => {
         setTeams(response);
-        console.log(teams);
       })
       .catch(error => {
         console.error("Error fetching teams:", error);
       });
-  }, [teams]);
+  }, []);
 
   const handleAddTeam = () => {
     const request = newTeamName;
@@ -134,6 +135,8 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
     const is_manager = accountType === "manager";
     const request = {
       username: username,
+      first_name: firstName,
+      last_name: lastName,
       email: email,
       password: password,
       is_manager: is_manager,
@@ -274,6 +277,18 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
               InputLabelProps={{
                 shrink: true,
               }}
+            />
+            <TextField
+              required
+              label='First Name'
+              onInput={(e) => setFirstName(e.target.value)}
+              value={firstName}
+            />
+            <TextField
+              required
+              label='Last Name'
+              onInput={(e) => setLastName(e.target.value)}
+              value={lastName}
             />
             <TextField
               required

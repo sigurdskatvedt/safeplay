@@ -1,7 +1,10 @@
-from django.urls import path
-from . import views
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import MatchViewSet
+
+router = DefaultRouter()
+router.register(r'matches', MatchViewSet)
 
 urlpatterns = [
-    path('matches/', views.matches_list, name='matches_list'),
-    #   path('api/matches/<int:match_id>/consent-requests/', views.consent_requests, name='consent_requests'),
+    path('', include(router.urls)),
 ]

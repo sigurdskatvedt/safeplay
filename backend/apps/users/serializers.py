@@ -16,13 +16,14 @@ from rest_framework.exceptions import AuthenticationFailed
 from django.utils.encoding import force_bytes, force_str
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 
-
+# TODO: Dont include all fields
 class UserSerializer(serializers.ModelSerializer):
     """Serializer for users"""
 
     class Meta:
         model = get_user_model()
-        fields = ['id', 'username', 'email', 'is_manager', 'is_staff', 'team_id']
+        fields = ['id', 'username', 'email', 'is_manager',
+                  'is_staff', 'team_id', 'first_name', 'last_name']
         read_only_fields = ['id']
 
 
@@ -76,12 +77,14 @@ class RegisterSerializer(UserSerializer):
     email = serializers.CharField(
         max_length=128, min_length=1,  required=True)
     team_id = serializers.IntegerField(write_only=True, required=False)
-
+    birthdate = serializers.DateField(required=False)
+    first_name = serializers.CharField(max_length=30, required=True)
+    last_name = serializers.CharField(max_length=30, required=True)
 
     class Meta:
         model = get_user_model()
-        fields = ['id', 'username', 'email',
-                  'password', 'is_manager', 'team_id']
+        fields = ['id', 'username', 'email', 'password', 'is_manager',
+                  'team_id', 'birthdate', 'first_name', 'last_name']
 
     def create(self, validated_data):
         team_id = validated_data.pop('team_id', None)

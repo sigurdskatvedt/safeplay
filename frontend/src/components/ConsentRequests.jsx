@@ -25,7 +25,7 @@ const ConsentRequests = ({ user }) => {
     setSnackbarOpen(true);
   };
 
-    const Update = () => {
+  const Update = () => {
     ConsentRequestsService.fetchAllRequests() // Assuming you have this method in the service
       .then((response) => {
         setRequests(response);
@@ -52,7 +52,7 @@ const ConsentRequests = ({ user }) => {
       ) : (
         <>
           <Typography sx={{ textAlign: "center", marginTop: 3 }} variant='h4'>
-            All Requests
+            Pending Requests
           </Typography>
 
           <Grid container padding={2} spacing={5} justifyContent='center'>
@@ -67,6 +67,12 @@ const ConsentRequests = ({ user }) => {
               </Grid>
             ))}
           </Grid>
+
+          <Typography sx={{ textAlign: "center", marginTop: 3 }} variant='h4'>
+            Request History
+          </Typography>
+
+          {/* Request history will be added here later */}
         </>
       )}
 
