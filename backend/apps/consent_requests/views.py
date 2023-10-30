@@ -23,7 +23,6 @@ class ConsentRequestViewSet(viewsets.ReadOnlyModelViewSet):
         return ConsentRequest.objects.filter(user=self.request.user, match__date_time__lt=timezone.now())
 
 
-
 class AllConsentRequestViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = ConsentRequestSerializer
@@ -42,6 +41,10 @@ class UserConsentRequestViewSet(viewsets.ReadOnlyModelViewSet):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def approve_request(request, request_id):
+    # Check if the user is a guardian
+    if request.user.user_type != 'guardian':
+        return Response({"error": "Only guardians can approve requests.",   "error_code": "not_guardian"}, status=403)
+
     try:
         consent_request = ConsentRequest.objects.get(
             id=request_id, user=request.user)
@@ -55,6 +58,10 @@ def approve_request(request, request_id):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def remove_approval(request, request_id):
+    # Check if the user is a guardian
+    if request.user.user_type != 'guardian':
+        return Response({"error": "Only guardians can approve requests.",   "error_code": "not_guardian"}, status=403)
+
     try:
         consent_request = ConsentRequest.objects.get(
             id=request_id, user=request.user)

@@ -89,6 +89,7 @@ class RegisterSerializer(UserSerializer):
         model = get_user_model()
         fields = ['id', 'username', 'email', 'password', 'user_type',  # Add 'user_type' to fields list
                   'team_id', 'birthdate', 'first_name', 'last_name']
+
     def create(self, validated_data):
         team_id = validated_data.pop('team_id', None)
         user = get_user_model().objects.create_user(**validated_data)

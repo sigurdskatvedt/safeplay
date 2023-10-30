@@ -4,23 +4,43 @@ import {
   CardContent,
   Button,
   Typography,
-  Stack,
   Divider,
+  Switch,
+  Stack,
 } from "@mui/material";
 import React from "react";
 import ConsentRequestsService from "../services/consentRequests";
 
 const ConsentRequestCard = ({ consentRequest, update, OpenSnackbar }) => {
 
+  const handleApprovalChange = (event) => {
+    const newApprovalStatus = event.target.checked;
+    if (newApprovalStatus) {
+      approveConsentRequest(consentRequest.id);
+    } else {
+      removeApproval(consentRequest.id);
+    }
+  };
+
+
   const approveConsentRequest = (id) => {
     ConsentRequestsService.approveRequest(id)
       .then((response) => {
         update();
         console.log(consentRequest);
-        OpenSnackbar("Consent request approved");
+        OpenSnackbar("Consent request approved", "success");
       })
       .catch((error) => {
-        console.log(error);
+        if (error.response.status === 403) {
+          const errorCode = error.response.data.error_code;
+          if (errorCode === 'not_guardian') {
+            OpenSnackbar("Only guardian can approve this request.", "error");
+          } else {
+            OpenSnackbar("You do not have permission to approve this request.", "error");
+          }
+        } else {
+          console.log(error);
+        }
       });
   };
 
@@ -28,23 +48,32 @@ const ConsentRequestCard = ({ consentRequest, update, OpenSnackbar }) => {
     ConsentRequestsService.removeApproval(id)
       .then((response) => {
         update();
-        OpenSnackbar("Approval removed");
+        OpenSnackbar("Approval removed", "success");
       })
       .catch((error) => {
-        console.log(error);
+        if (error.response.status === 403) {
+          const errorCode = error.response.data.error_code;
+          if (errorCode === 'not_guardian') {
+            OpenSnackbar("Only guardian can approve this request.", "error");
+          } else {
+            OpenSnackbar("You do not have permission to remove approval for this request.", "error");
+          }
+        } else {
+          console.log(error);
+        }
       });
   };
 
   return (
     <Card
       sx={{
-        position: "relative",
+        position: 'relative',
         maxHeight: 400,
         minHeight: 200,
         width: 250,
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
       }}
     >
       <CardContent>
@@ -62,38 +91,17 @@ const ConsentRequestCard = ({ consentRequest, update, OpenSnackbar }) => {
           Player: {consentRequest.user.first_name} {consentRequest.user.last_name}
         </Typography>
 
-        {consentRequest.is_approved ? (
-          <Typography variant='body2' color='success.main' sx={{ mt: 1 }}>
-            Approved
+        <Stack direction="row" alignItems="center" spacing={1}>
+          <Typography variant='body2' color={consentRequest.is_approved ? 'success.main' : 'error.main'} sx={{ mt: 1 }}>
+            {consentRequest.is_approved ? 'Approved' : 'Not Approved'}
           </Typography>
-        ) : (
-          <Typography variant='body2' color='error.main' sx={{ mt: 1 }}>
-            Not Approved
-          </Typography>
-        )}
+          <Switch
+            checked={consentRequest.is_approved}
+            onChange={handleApprovalChange}
+            inputProps={{ 'aria-label': 'controlled' }}
+          />
+        </Stack>
       </CardContent>
-      <CardActions sx={{ justifyContent: "center" }}>
-        {!consentRequest.is_approved && (
-          <Button
-            size='small'
-            variant='contained'
-            color='primary'
-            onClick={() => approveConsentRequest(consentRequest.id)}
-          >
-            Approve
-          </Button>
-        )}
-        {consentRequest.is_approved && (
-          <Button
-            size='small'
-            variant='contained'
-            color='secondary'
-            onClick={() => removeApproval(consentRequest.id)}
-          >
-            Remove Approval
-          </Button>
-        )}
-      </CardActions>
     </Card>
   );
 };

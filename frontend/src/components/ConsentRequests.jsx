@@ -9,6 +9,8 @@ const ConsentRequests = ({ user }) => {
   const [pastRequests, setPastRequests] = useState([]); // New state variable for past requests
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarText, setSnackbarText] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success"); // New state variable for Snackbar severity
+
 
   const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />;
@@ -21,8 +23,9 @@ const ConsentRequests = ({ user }) => {
     setSnackbarOpen(false);
   };
 
-  const OpenSnackbar = (text) => {
+  const OpenSnackbar = (text, severity = "success") => {
     setSnackbarText(text);
+    setSnackbarSeverity(severity); // Set the Snackbar severity
     setSnackbarOpen(true);
   };
 
@@ -101,7 +104,7 @@ const ConsentRequests = ({ user }) => {
         autoHideDuration={5000}
         onClose={handleClose}
       >
-        <Alert onClose={handleClose} severity='success' sx={{ width: "100%" }}>
+        <Alert onClose={handleClose} severity={snackbarSeverity} sx={{ width: "100%" }}>
           {snackbarText}
         </Alert>
       </Snackbar>
