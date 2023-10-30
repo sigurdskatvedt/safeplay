@@ -1,9 +1,8 @@
-from django.db import models
+# backend/apps/matches/models.py
 
 from django.db import models
 from apps.teams.models import Team
 from apps.consent_requests.models import ConsentRequest
-
 
 class Match(models.Model):
     team1 = models.ForeignKey(
@@ -20,3 +19,4 @@ class Match(models.Model):
             for team in [self.team1, self.team2]:
                 for user in team.members.all():
                     ConsentRequest.objects.create(user=user, match=self)
+
