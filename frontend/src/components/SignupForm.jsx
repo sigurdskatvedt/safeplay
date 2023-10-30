@@ -42,6 +42,7 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
   const [snackbarType, setSnackbarType] = useState("success");
   const [accountType, setAccountType] = React.useState("player");
   const [birthdate, setBirthdate] = React.useState(new Date().toISOString().split('T')[0]);
+  const [userType, setUserType] = React.useState("player");
   const [open, setOpen] = useState(false);
   const [currentTeam, setCurrentTeam] = useState("");
   const [teams, setTeams] = useState([]);
@@ -58,6 +59,10 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
         console.error("Error fetching teams:", error);
       });
   }, []);
+
+  const handleChangeUserType = (event) => {
+    setUserType(event.target.value);
+  };
 
   const handleAddTeam = () => {
     const request = newTeamName;
@@ -132,14 +137,13 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
   const onSubmit = (e) => {
     e.preventDefault();
 
-    const is_manager = accountType === "manager";
     const request = {
       username: username,
       first_name: firstName,
       last_name: lastName,
       email: email,
       password: password,
-      is_manager: is_manager,
+      user_type: userType, // Send the selected user type to the backend
       birthdate: birthdate,
       team_id: currentTeam,
     };
@@ -197,26 +201,17 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
             <img alt='logo' src='logo512primary.png' />
 
             <FormControl>
-              <FormLabel id='row-radio-buttons-group-label'>
-                Account type
-              </FormLabel>
+              <FormLabel id="user-type-radio-group-label">User Type</FormLabel>
               <RadioGroup
                 row
-                aria-labelledby='demo-row-radio-buttons-group-label'
-                name='row-radio-buttons-group'
-                value={accountType}
-                onChange={handleChangeAccountType}
+                aria-labelledby="user-type-radio-group-label"
+                name="user-type-radio-group"
+                value={userType}
+                onChange={handleChangeUserType}
               >
-                <FormControlLabel
-                  value='player'
-                  control={<Radio />}
-                  label='Player'
-                />
-                <FormControlLabel
-                  value='manager'
-                  control={<Radio />}
-                  label='Manager'
-                />
+                <FormControlLabel value="player" control={<Radio />} label="Player" />
+                <FormControlLabel value="guardian" control={<Radio />} label="Guardian" />
+                <FormControlLabel value="manager" control={<Radio />} label="Manager" />
               </RadioGroup>
             </FormControl>
             <FormControl>

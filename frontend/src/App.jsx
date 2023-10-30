@@ -60,15 +60,14 @@ const App = () => {
                 <Avatar alt='Home' src='favicon.ico' />
               </Button>
             </Grid>
-            {user?.is_manager ? (
+            {user?.user_type === 'manager' ? (  // Updated condition
               <Grid item marginTop={0.8}>
                 <Button color='inherit' component={Link} to='/matches'>
                   Overview
                 </Button>
               </Grid>
             ) : null}
-
-            {user?.is_manager ? (
+            {user?.user_type === 'manager' ? (  // Updated condition
               <Grid item marginTop={0.8}>
                 <Button color='inherit' component={Link} to='/creatematch'>
                   Create New Match
@@ -82,7 +81,7 @@ const App = () => {
                 </Button>
               </Grid>
             ) : null}
-            {user?.id ? (
+            {user?.user_type === 'guardian' || user?.user_type === 'player' ? (  // Updated condition
               <Grid item marginTop={0.8}>
                 <Button color='inherit' component={Link} to='/consent-requests'>
                   Consent Requests

@@ -17,13 +17,15 @@ from django.utils.encoding import force_bytes, force_str
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 
 # TODO: Dont include all fields
+
+
 class UserSerializer(serializers.ModelSerializer):
     """Serializer for users"""
 
     class Meta:
         model = get_user_model()
-        fields = ['id', 'username', 'email', 'is_manager',
-                  'is_staff', 'team_id', 'first_name', 'last_name']
+        fields = ['id', 'username', 'email',
+                  'is_staff', 'team_id', 'first_name', 'last_name', 'user_type']
         read_only_fields = ['id']
 
 
@@ -80,12 +82,13 @@ class RegisterSerializer(UserSerializer):
     birthdate = serializers.DateField(required=False)
     first_name = serializers.CharField(max_length=30, required=True)
     last_name = serializers.CharField(max_length=30, required=True)
+    user_type = serializers.ChoiceField(
+        choices=User.USER_TYPES, required=True)  # Add user_type field
 
     class Meta:
         model = get_user_model()
-        fields = ['id', 'username', 'email', 'password', 'is_manager',
+        fields = ['id', 'username', 'email', 'password', 'user_type',  # Add 'user_type' to fields list
                   'team_id', 'birthdate', 'first_name', 'last_name']
-
     def create(self, validated_data):
         team_id = validated_data.pop('team_id', None)
         user = get_user_model().objects.create_user(**validated_data)
