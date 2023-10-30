@@ -19,7 +19,7 @@ services:
       - DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL}
     volumes:
       - ./backend/apps:/app/apps
-      - ./backend/securehelp:/app/securehelp
+      - ./backend/safeplay:/app/safeplay
     command: ["/bin/bash", "entrypoint.dev.sh"]
     networks:
       backend_bridge:

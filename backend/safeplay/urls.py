@@ -23,4 +23,6 @@ urlpatterns = [
     path('api/', include('apps.teams.urls')),
     path('api/', include('apps.matches.urls')),
     path('api/', include('apps.consent_requests.urls')),
+    path('api/fields/', include('apps.fields.urls')),  # Updated line
+
 ]
