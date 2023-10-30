@@ -1,5 +1,5 @@
 """
-WSGI config for securehelp project.
+WSGI config for safeplay project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -13,7 +13,7 @@ from django.conf import settings
 from whitenoise import WhiteNoise
 from django.conf import settings
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'securehelp.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'safeplay.settings')
 
 # Get wsgi application (standard approach)
 application = get_wsgi_application()

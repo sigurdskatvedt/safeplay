@@ -17,4 +17,4 @@ echo "WARNING: This error is ignored as it most likely is 'That username is alre
 && echo "If you wish to alter the user credentials, then delete the user first."
 #python manage.py loaddata initial.json # Add some initial data
 
-gunicorn securehelp.wsgi --log-file - -b 0.0.0.0:8000 --reload
+gunicorn safeplay.wsgi --log-file - -b 0.0.0.0:8000 --reload
