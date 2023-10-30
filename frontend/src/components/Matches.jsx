@@ -20,33 +20,39 @@ const Matches = () => {
     try {
       const matchesData = await MatchesService.GetMatches();
       console.log(matchesData); // Log the fetched matches data
-      // Process and set the matches data to state as per your requirements
-      const upcomingMatchesData = matchesData.filter(
-        (match) => match.date_time > new Date().toISOString()
-      );
-      const finishedMatchesData = matchesData.filter(
-        (match) => match.date_time <= new Date().toISOString()
-      );
 
-      const upcomingMatches = upcomingMatchesData.map((match) => ({
-        id: match.id,
-        teams: `${match.team1.name} vs ${match.team2.name}`,
-        date: match.date_time,
-        // pending: 0, // You need to add logic to calculate the number of pending requests
-        accepted: 0, // You need to add logic to calculate the number of accepted requests
-        declined: 0, // You need to add logic to calculate the number of declined requests
-      }));
+      const upcomingMatches = matchesData.filter(match => match.date_time > new Date().toISOString()).map(match => {
+        const accepted = match.consent_requests.filter(request => request.is_approved).length;
+        const declined = match.consent_requests.filter(request => !request.is_approved).length;
 
-      const finishedMatches = finishedMatchesData.map((match) => ({
-        id: match.id,
-        teams: `${match.team1.name} vs ${match.team2.name}`,
-        date: match.date_time,
-        // pending: 0, // You need to add logic to calculate the number of pending requests
-        accepted: 0, // You need to add logic to calculate the number of accepted requests
-        declined: 0, // You need to add logic to calculate the number of declined requests
-        // withdrawn: 0, // You need to add logic to calculate the number of withdrawn requests
-        status: "Not approved", // You need to add logic to calculate the status
-      }));
+        return {
+          id: match.id,
+          teams: `${match.team1.name} vs ${match.team2.name}`,
+          date: match.date_time,
+          accepted: accepted,
+          declined: declined,
+        };
+      });
+
+      const finishedMatches = matchesData.filter(match => match.date_time <= new Date().toISOString()).map(match => {
+        const accepted = match.consent_requests.filter(
+          (request) => request.is_approved
+        ).length;
+        const declined = match.consent_requests.filter(
+          (request) => !request.is_approved
+        ).length;
+        const status = declined === 0 ? "OK" : "Not approved";
+
+        return {
+          id: match.id,
+          teams: `${match.team1.name} vs ${match.team2.name}`,
+          date: match.date_time,
+          accepted: accepted,
+          declined: declined,
+          status: status,
+        };
+      });
+
 
       setUpcomingMatches(upcomingMatches);
       setFinishedMatches(finishedMatches);
