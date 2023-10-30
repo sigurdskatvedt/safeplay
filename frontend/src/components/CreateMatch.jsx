@@ -1,28 +1,50 @@
-import React from "react";
+import React, { useState, useEffect } from 'react';
 import {
   Container,
   Typography,
   TextField,
   Button,
-} from "@mui/material";
+  MenuItem,
+} from '@mui/material';
+import MatchesService from '../services/matches';
+import AuthService from '../services/auth';
 
 const CreateMatch = () => {
+  const [teams, setTeams] = useState([]);
+  const [formData, setFormData] = useState({
+    team1: '',
+    team2: '',
+    field: '',
+    date: '',
+    time: '',
+  });
+
+  useEffect(() => {
+    AuthService.fetchTeams()
+      .then(response => {
+        setTeams(response);
+      })
+      .catch(error => {
+        console.error("Error fetching teams:", error);
+      });
+  }, []);
+
   const handleSubmit = (event) => {
     event.preventDefault();
-    // Here, you would handle the form submission logic, e.g., saving the match to a database.
-    const { team1, team2, field, date, time } = event.target.elements;
-    console.log({
-      team1: team1.value,
-      team2: team2.value,
-      field: field.value,
-      date: date.value,
-      time: time.value
-    });
+    MatchesService.AddMatch(formData)
+      .then(response => {
+        console.log("Match added successfully:", response);
+        // Handle success, e.g., show a success message or redirect to another page
+      })
+      .catch(error => {
+        console.error("Error adding match:", error);
+        // Handle error, e.g., show an error message
+      });
   };
 
   return (
     <Container maxWidth='md'>
-      <Typography sx={{ textAlign: "center", marginTop: 3 }} variant='h2'>
+      <Typography sx={{ textAlign: 'center', marginTop: 3 }} variant='h2'>
         Create Match
       </Typography>
 
@@ -34,7 +56,17 @@ const CreateMatch = () => {
           name="team1"
           variant="outlined"
           required
-        />
+          select
+          value={formData.team1}
+          onChange={(e) => setFormData({ ...formData, team1: e.target.value })}
+        >
+          {teams.map((team) => (
+            <MenuItem key={team.id} value={team.id}>
+              {team.name}
+            </MenuItem>
+          ))}
+        </TextField>
+
         <TextField
           fullWidth
           margin="normal"
@@ -42,7 +74,17 @@ const CreateMatch = () => {
           name="team2"
           variant="outlined"
           required
-        />
+          select
+          value={formData.team2}
+          onChange={(e) => setFormData({ ...formData, team2: e.target.value })}
+        >
+          {teams.map((team) => (
+            <MenuItem key={team.id} value={team.id}>
+              {team.name}
+            </MenuItem>
+          ))}
+        </TextField>
+
         <TextField
           fullWidth
           margin="normal"
@@ -50,7 +92,10 @@ const CreateMatch = () => {
           name="field"
           variant="outlined"
           required
+          value={formData.field}
+          onChange={(e) => setFormData({ ...formData, field: e.target.value })}
         />
+
         <TextField
           fullWidth
           margin="normal"
@@ -62,7 +107,10 @@ const CreateMatch = () => {
           }}
           variant="outlined"
           required
+          value={formData.date}
+          onChange={(e) => setFormData({ ...formData, date: e.target.value })}
         />
+
         <TextField
           fullWidth
           margin="normal"
@@ -74,8 +122,9 @@ const CreateMatch = () => {
           }}
           variant="outlined"
           required
+          value={formData.time}
+          onChange={(e) => setFormData({ ...formData, time: e.target.value })}
         />
-
         <Button
           type="submit"
           fullWidth

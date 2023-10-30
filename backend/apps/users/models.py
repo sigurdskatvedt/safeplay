@@ -9,8 +9,14 @@ import django.utils.timezone
 
 
 class User(AbstractUser):
-    """ Overide user model to be able to add custom fields"""
+    USER_TYPES = (
+        ('manager', 'Manager'),
+        ('player', 'Player'),
+        ('guardian', 'Guardian'),
+    )
 
+    user_type = models.CharField(
+        max_length=20, choices=USER_TYPES, default='player')
     is_manager = models.BooleanField(default=False)
     birthdate = models.DateField(
         blank=True, null=True, verbose_name='Birthdate')

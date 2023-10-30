@@ -5,13 +5,15 @@ const GetMatches = () => {
   return request.then((response) => response.data);
 };
 
-// const GetMatchConsentRequests = (matchId) => {
-//   const request = api.get(`/api/matches/${matchId}/consent-requests/`);
-//   return request.then((response) => response.data);
-// };
+const AddMatch = (matchData) => {
+  const request = api.post("/matches/", matchData);
+  return request.then((response) => response.data);
+};
 
 const MatchesService = {
   GetMatches,
+  AddMatch,
 };
 
 export default MatchesService;
+
