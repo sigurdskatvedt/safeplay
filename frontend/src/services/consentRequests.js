@@ -1,7 +1,11 @@
 import api from "./api";
 
-const fetchAllRequests = () => {
+const fetchPendingRequests = () => {
   return api.get("/user-requests/").then((response) => response.data);
+};
+
+const fetchPastRequests = () => {
+    return api.get("/past_requests/").then((response) => response.data);
 };
 
 const approveRequest = (requestId) => {
@@ -15,8 +19,10 @@ const removeApproval = (requestId) => {
 const ConsentRequestsService = {
   approveRequest,
   removeApproval,
-  fetchAllRequests,
+  fetchPendingRequests,
+  fetchPastRequests,
 };
 
 export default ConsentRequestsService;
+
 

@@ -6,6 +6,7 @@ from .models import ConsentRequest
 from .serializers import ConsentRequestSerializer
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+from django.utils import timezone
 
 
 class ConsentRequestViewSet(viewsets.ReadOnlyModelViewSet):
@@ -15,7 +16,12 @@ class ConsentRequestViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         # Return only the pending requests for the authenticated user
-        return ConsentRequest.objects.filter(user=self.request.user, is_approved=False)
+        return ConsentRequest.objects.filter(user=self.request.user, match__date_time__gte=timezone.now(), is_approved=False)
+
+    def get_past_requests(self):
+        # Return only the past requests for the authenticated user
+        return ConsentRequest.objects.filter(user=self.request.user, match__date_time__lt=timezone.now())
+
 
 
 class AllConsentRequestViewSet(viewsets.ReadOnlyModelViewSet):
@@ -29,9 +35,10 @@ class UserConsentRequestViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = ConsentRequestSerializer
 
     def get_queryset(self):
-        return ConsentRequest.objects.filter(user=self.request.user)
+        return ConsentRequest.objects.filter(match__date_time__gte=timezone.now(), user=self.request.user)
 
 
+# TODO: Should not be able to set in the past
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def approve_request(request, request_id):
@@ -56,3 +63,12 @@ def remove_approval(request, request_id):
         return Response({"message": "Approval removed successfully."}, status=200)
     except ConsentRequest.DoesNotExist:
         return Response({"error": "Request not found."}, status=404)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def past_consent_requests(request):
+    viewset = ConsentRequestViewSet(request=request)
+    past_requests = viewset.get_past_requests()
+    serializer = ConsentRequestSerializer(past_requests, many=True)
+    return Response(serializer.data)

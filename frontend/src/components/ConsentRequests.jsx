@@ -6,6 +6,7 @@ import Request from "./Request"; // You might want to rename this component to C
 
 const ConsentRequests = ({ user }) => {
   const [requests, setRequests] = useState([]);
+  const [pastRequests, setPastRequests] = useState([]); // New state variable for past requests
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarText, setSnackbarText] = useState("");
 
@@ -26,9 +27,16 @@ const ConsentRequests = ({ user }) => {
   };
 
   const Update = () => {
-    ConsentRequestsService.fetchAllRequests() // Assuming you have this method in the service
+    ConsentRequestsService.fetchPendingRequests() // Assuming you have this method in the service
       .then((response) => {
         setRequests(response);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    ConsentRequestsService.fetchPastRequests() // Fetch past requests
+      .then((response) => {
+        setPastRequests(response); // Update the state variable for past requests
       })
       .catch((error) => {
         console.log(error);
@@ -72,7 +80,18 @@ const ConsentRequests = ({ user }) => {
             Request History
           </Typography>
 
-          {/* Request history will be added here later */}
+          <Grid container padding={2} spacing={5} justifyContent='center'>
+            {pastRequests.map((r) => (
+              <Grid item xs={12} sm={6} md={4} lg={3} xl={3} key={r.id}>
+                <Request
+                  user={user}
+                  consentRequest={r}
+                  update={Update}
+                  OpenSnackbar={OpenSnackbar}
+                />
+              </Grid>
+            ))}
+          </Grid>
         </>
       )}
 
