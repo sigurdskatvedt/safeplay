@@ -10,3 +10,12 @@ class Match(models.Model):
     date_time = models.DateTimeField()
     #consent_requests = models.ManyToManyField(ConsentRequest)
 
+    def save(self, *args, **kwargs):
+        is_new = not self.pk  # Check if this is a new match
+        super().save(*args, **kwargs)  # Call the original save method
+
+        if is_new:
+            # For each user in team1 and team2, create a consent request
+            for team in [self.team1, self.team2]:
+                for user in team.members.all():
+                    ConsentRequest.objects.create(user=user, match=self)

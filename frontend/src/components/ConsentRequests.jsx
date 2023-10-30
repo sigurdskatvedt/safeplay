@@ -1,21 +1,13 @@
-import { Container, Grid, Snackbar, Typography, Fab } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
+import { Container, Grid, Snackbar, Typography } from "@mui/material";
 import MuiAlert from "@mui/material/Alert";
 import React, { useState, useEffect } from "react";
-import HelpRequestService from "../services/helpRequests";
-import Request from "./Request";
-import NewRequest from "./NewRequest";
-import Modal from "@mui/material/Modal";
+import ConsentRequestsService from "../services/consentRequests";
+import Request from "./Request"; // You might want to rename this component to ConsentRequest or similar
 
 const ConsentRequests = ({ user }) => {
   const [requests, setRequests] = useState([]);
-
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarText, setSnackbarText] = useState("");
-
-  const [open, setOpen] = useState(false);
-  const handleModalOpen = () => setOpen(true);
-  const handleModalClose = () => setOpen(false);
 
   const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />;
@@ -33,8 +25,8 @@ const ConsentRequests = ({ user }) => {
     setSnackbarOpen(true);
   };
 
-  const Update = () => {
-    HelpRequestService.GetHelpRequests()
+    const Update = () => {
+    ConsentRequestsService.fetchAllRequests() // Assuming you have this method in the service
       .then((response) => {
         setRequests(response);
       })
@@ -42,6 +34,7 @@ const ConsentRequests = ({ user }) => {
         console.log(error);
       });
   };
+
   useEffect(() => {
     Update();
   }, []);
@@ -54,95 +47,28 @@ const ConsentRequests = ({ user }) => {
 
       {user === null ? (
         <Typography sx={{ textAlign: "center", marginTop: 3 }} variant='h4'>
-          Please log in to see help requests
+          Please log in to see consent requests
         </Typography>
       ) : (
         <>
-          <Typography
-            sx={{ textAlign: "center", marginTop: 3 }}
-            variant='h5'
-            color='text.secondary'
-          >
-            Welcome to the Help Request page! Manage Help Requests here.
-          </Typography>
-
-          {!requests && !user.is_volunteer ? (
-            <Typography sx={{ textAlign: "center", marginTop: 3 }} variant='h6'>
-              You have not made any requests. Press the "New Request" button to
-              create a new request.
-            </Typography>
-          ) : null}
-
-          {user.is_volunteer ? (
-            <Typography sx={{ textAlign: "center", marginTop: 3 }} variant='h6'>
-              As a volunteer, you can view and accept requests from refugees
-              here. You only have access to requests that are not yet accepted
-              by others, and you need to be certified for the service type of
-              the request.
-            </Typography>
-          ) : null}
-
           <Typography sx={{ textAlign: "center", marginTop: 3 }} variant='h4'>
-            Pending Requests
+            All Requests
           </Typography>
 
           <Grid container padding={2} spacing={5} justifyContent='center'>
-            {requests
-              ?.filter((r) => r.volunteer === null && !r.finished)
-              .map((r) => (
-                <Grid item xs={12} sm={6} md={4} lg={3} xl={3} key={r.id}>
-                  <Request
-                    user={user}
-                    helpRequest={r}
-                    update={Update}
-                    OpenSnackbar={OpenSnackbar}
-                  />
-                </Grid>
-              ))}
+            {requests.map((r) => (
+              <Grid item xs={12} sm={6} md={4} lg={3} xl={3} key={r.id}>
+                <Request
+                  user={user}
+                  consentRequest={r}
+                  update={Update}
+                  OpenSnackbar={OpenSnackbar}
+                />
+              </Grid>
+            ))}
           </Grid>
-
-          <Typography sx={{ textAlign: "center", marginTop: 3 }} variant='h4'>
-            Finished Requests
-          </Typography>
-
-          <Grid container padding={2} spacing={5} justifyContent='center'>
-            {requests
-              ?.filter((r) => r.finished)
-              .map((r) => (
-                <Grid item xs={12} sm={6} md={4} lg={3} xl={3} key={r.id}>
-                  <Request
-                    user={user}
-                    helpRequest={r}
-                    update={Update}
-                    OpenSnackbar={OpenSnackbar}
-                  />
-                </Grid>
-              ))}
-          </Grid>
-
-          {user.is_volunteer ? null : (
-            <Fab
-              sx={{ position: "fixed", bottom: 20, right: 20 }}
-              variant='extended'
-              color='primary'
-              aria-label='add'
-              onClick={handleModalOpen}
-            >
-              New Request
-              {<AddIcon sx={{ ml: 1 }} />}
-            </Fab>
-          )}
         </>
       )}
-
-      <Modal open={open} onClose={handleModalClose}>
-        <NewRequest
-          OpenSnackbar={OpenSnackbar}
-          handleClose={handleModalClose}
-          setOpen={setOpen}
-          update={Update}
-        ></NewRequest>
-      </Modal>
 
       <Snackbar
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
@@ -159,3 +85,4 @@ const ConsentRequests = ({ user }) => {
 };
 
 export default ConsentRequests;
+

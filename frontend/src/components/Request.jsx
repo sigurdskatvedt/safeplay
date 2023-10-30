@@ -5,72 +5,28 @@ import {
   Button,
   Typography,
   Stack,
-  Popover,
 } from "@mui/material";
-import React, { useState } from "react";
-import HelpRequestService from "../services/helpRequests";
-import DocumentService from "../services/documents";
+import React from "react";
+import ConsentRequestsService from "../services/consentRequests";
 
-const Request = ({ helpRequest, update, OpenSnackbar, user }) => {
-  const [anchorEl, setAnchorEl] = useState(null);
+const ConsentRequestCard = ({ consentRequest, update, OpenSnackbar, user }) => {
 
-  const [documents, setDocuments] = useState([]);
-
-  const handleClick = (event, refugeeId) => {
-    setAnchorEl(event.currentTarget);
-    DocumentService.GetRefugeeDocumentInfos(refugeeId)
-      .then((c) => setDocuments(c))
-      .catch((err) => console.log(err));
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-  const open = Boolean(anchorEl);
-  const id = open ? "simple-popover" : undefined;
-
-  const downloadFile = (url) => {
-    DocumentService.DownloadDocument(url)
+  const approveConsentRequest = (id) => {
+    ConsentRequestsService.approveRequest(id)
       .then((response) => {
-        const file = new File([response], url, { type: response.type });
-        window.open(URL.createObjectURL(file));
-      })
-      .catch((error) => console.error(error));
-  };
-
-  const AcceptHelpRequest = (id) => {
-    HelpRequestService.AcceptHelpRequest({
-      request_id: id,
-    })
-      .then((response) => {
-        console.log("Help request accepted");
         update();
-        OpenSnackbar("Help request accepted");
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-  const FinishHelpRequest = (id) => {
-    HelpRequestService.FinishHelpRequest({
-      request_id: id,
-    })
-      .then((response) => {
-        console.log("Help request finished");
-        update();
-        OpenSnackbar("Help request finished");
+        OpenSnackbar("Consent request approved");
       })
       .catch((error) => {
         console.log(error);
       });
   };
 
-  const DeleteHelpRequest = (id) => {
-    HelpRequestService.DeleteHelpRequest(id)
+  const removeApproval = (id) => {
+    ConsentRequestsService.removeApproval(id)
       .then((response) => {
-        console.log("Help request deleted");
         update();
-        OpenSnackbar("Help request deleted");
+        OpenSnackbar("Approval removed");
       })
       .catch((error) => {
         console.log(error);
@@ -88,101 +44,50 @@ const Request = ({ helpRequest, update, OpenSnackbar, user }) => {
     >
       <CardContent>
         <Typography variant='h4' component='div'>
-          {helpRequest.service_type}
+          Consent Request for {consentRequest.map_name}
         </Typography>
 
-        <Typography variant='h6'>Refugee: {helpRequest.refugee}</Typography>
+        <Typography variant='h6'>User: {consentRequest.user}</Typography>
 
-        {helpRequest.volunteer ? (
-          <Typography variant='h6'>
-            {"Volunteer: " + helpRequest.volunteer}
+        {consentRequest.is_approved ? (
+          <Typography variant='h6' color='success'>
+            Approved
           </Typography>
-        ) : null}
+        ) : (
+          <Typography variant='h6' color='error'>
+            Not Approved
+          </Typography>
+        )}
 
-        <Stack alignItems='center' justifyContent='center' direction='row'>
-          {helpRequest.volunteer != null && user.is_volunteer ? (
-            <>
-              <Button
-                variant='outlined'
-                aria-describedby={id}
-                onClick={(e) => handleClick(e, helpRequest.refugee)}
-              >
-                Show Documents{" "}
-              </Button>
-              <Popover
-                id={id}
-                open={open}
-                anchorEl={anchorEl}
-                onClose={handleClose}
-                anchorOrigin={{
-                  vertical: "bottom",
-                  horizontal: "left",
-                }}
-              >
-                <Stack
-                  direction='column'
-                  alignItems='center'
-                  justifyContent='center'
-                >
-                  {documents.length ? (
-                    documents.map((document) => (
-                      <Button
-                        key={document.id}
-                        onClick={() => downloadFile(document.link)}
-                      >
-                        {document.name}
-                      </Button>
-                    ))
-                  ) : (
-                    <Typography variant='h6'>
-                      {helpRequest.refugee} has no documents
-                    </Typography>
-                  )}
-                </Stack>
-              </Popover>
-            </>
-          ) : null}
-        </Stack>
-        <div>{helpRequest.description}</div>
+        <div>{consentRequest.description}</div>
       </CardContent>
       <Stack alignItems='center'>
         <CardActions>
-          {!user.is_volunteer && !helpRequest.finished ? (
+          {!consentRequest.is_approved && (
+            <Button
+              size='small'
+              variant='contained'
+              color='primary'
+              onClick={() => approveConsentRequest(consentRequest.id)}
+            >
+              Approve
+            </Button>
+          )}
+          {consentRequest.is_approved && (
             <Button
               size='small'
               variant='contained'
               color='secondary'
-              onClick={() => DeleteHelpRequest(helpRequest.id)}
+              onClick={() => removeApproval(consentRequest.id)}
             >
-              Delete Request
+              Remove Approval
             </Button>
-          ) : !helpRequest.finished && helpRequest.volunteer == null ? (
-            <Button
-              size='small'
-              variant='contained'
-              color='primary'
-              onClick={() => AcceptHelpRequest(helpRequest.request_id)}
-            >
-              Accept
-            </Button>
-          ) : null}
-
-          {!helpRequest.finished &&
-          helpRequest.volunteer != null &&
-          user.is_volunteer ? (
-            <Button
-              size='small'
-              variant='contained'
-              color='primary'
-              onClick={() => FinishHelpRequest(helpRequest.id)}
-            >
-              Finish
-            </Button>
-          ) : null}
+          )}
         </CardActions>
       </Stack>
     </Card>
   );
 };
 
-export default Request;
+export default ConsentRequestCard;
+

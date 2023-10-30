@@ -22,4 +22,5 @@ urlpatterns = [
     path('', include('apps.certifications.urls')),
     path('api/', include('apps.teams.urls')),
     path('api/', include('apps.matches.urls')),
+    path('api/', include('apps.consent_requests.urls')),
 ]
