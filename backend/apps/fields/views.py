@@ -1,16 +1,21 @@
-from rest_framework import viewsets
+# apps/fields/views.py
+
 from rest_framework.response import Response
-from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
+from django.shortcuts import get_object_or_404
+from .serializers import BookingSerializer
 from .models import Field, Booking
 from django.utils.dateparse import parse_datetime
 
+class BookingsView(APIView):
+    def get(self, request):
+        bookings = Booking.objects.all()
+        serializer = BookingSerializer(bookings, many=True)
+        return Response(serializer.data)
 
 class BookFieldView(APIView):
     def post(self, request, field_id):
         field = get_object_or_404(Field, pk=field_id)
-        # ... (rest of the implementation)
-
         start_time = parse_datetime(request.data.get('start_time'))
         end_time = parse_datetime(request.data.get('end_time'))
 
@@ -27,3 +32,4 @@ class BookFieldView(APIView):
         new_booking = Booking.objects.create(
             field=field, start_time=start_time, end_time=end_time)
         return Response({'message': 'Field booked successfully', 'booking_id': new_booking.id})
+
