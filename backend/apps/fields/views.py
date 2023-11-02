@@ -1,17 +1,22 @@
 # apps/fields/views.py
-
+import pytz
+from datetime import datetime, date, time
+from dateutil.parser import isoparse
 from rest_framework.response import Response
+from rest_framework import status
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from .serializers import BookingSerializer
 from .models import Field, Booking
 from django.utils.dateparse import parse_datetime
 
+
 class BookingsView(APIView):
     def get(self, request):
         bookings = Booking.objects.all()
         serializer = BookingSerializer(bookings, many=True)
         return Response(serializer.data)
+
 
 class BookFieldView(APIView):
     def post(self, request, field_id):
@@ -33,3 +38,31 @@ class BookFieldView(APIView):
             field=field, start_time=start_time, end_time=end_time)
         return Response({'message': 'Field booked successfully', 'booking_id': new_booking.id})
 
+
+class FieldBookingsView(APIView):
+    def get(self, request, field_id):
+        field = get_object_or_404(Field, pk=field_id)
+        date_str = request.query_params.get('date')
+        user_timezone_str = request.query_params.get('timezone')
+
+        if date_str is None:
+            return Response({'error': 'Date is required'}, status=status.HTTP_400_BAD_REQUEST)
+        if user_timezone_str is None:
+            return Response({'error': 'Timezone is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        print("datestring:" + date_str)
+        date_obj = isoparse(date_str)
+
+        # Convert UTC date to user's timezone
+        user_timezone = pytz.timezone(user_timezone_str)
+        local_date_obj = date_obj.astimezone(user_timezone)
+
+        start_time = datetime.combine(local_date_obj, time.min)
+        end_time = datetime.combine(local_date_obj, time.max)
+        print("start_time:", start_time)
+        print("end_time:", end_time)
+
+        bookings = Booking.objects.filter(
+            field=field, start_time__gte=start_time, end_time__lte=end_time)
+        serializer = BookingSerializer(bookings, many=True)
+        return Response(serializer.data)

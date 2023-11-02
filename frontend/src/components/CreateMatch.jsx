@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import dayjs from 'dayjs';
 import {
   Container,
   Typography,
@@ -6,45 +7,102 @@ import {
   Button,
   MenuItem,
 } from '@mui/material';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import MatchesService from '../services/matches';
 import AuthService from '../services/auth';
+import FieldsService from '../services/fields';
 
 const CreateMatch = () => {
   const [teams, setTeams] = useState([]);
+  const [unavailableTimeSlots, setUnavailableTimeSlots] = useState([]);
   const [formData, setFormData] = useState({
     team1: '',
     team2: '',
     field: '',
     date: '',
     time: '',
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone, // add user's timezone
   });
 
   useEffect(() => {
     AuthService.fetchTeams()
-      .then(response => {
+      .then((response) => {
         setTeams(response);
       })
-      .catch(error => {
-        console.error("Error fetching teams:", error);
+      .catch((error) => {
+        console.error('Error fetching teams:', error);
       });
   }, []);
+
+  useEffect(() => {
+    if (formData.field && formData.date) {
+      FieldsService.FetchAvailableTimeSlots(formData.field, formData.date, formData.timezone)
+        .then((response) => {
+          const parsedResponse = response.map((timeSlot) => ({
+            ...timeSlot,
+            start_time: dayjs(timeSlot.start_time),
+            end_time: dayjs(timeSlot.end_time),
+          }));
+          console.log(parsedResponse);
+          setUnavailableTimeSlots(parsedResponse);
+        })
+        .catch((error) => {
+          console.error('Error fetching available time slots:', error);
+        });
+    }
+  }, [formData.field, formData.date, formData.timezone]);
+
 
   const handleSubmit = (event) => {
     event.preventDefault();
     MatchesService.AddMatch(formData)
-      .then(response => {
-        console.log("Match added successfully:", response);
+      .then((response) => {
+        console.log('Match added successfully:', response);
         // Handle success, e.g., show a success message or redirect to another page
       })
-      .catch(error => {
-        console.error("Error adding match:", error);
+      .catch((error) => {
+        console.error('Error adding match:', error);
         // Handle error, e.g., show an error message
       });
   };
 
+  const handleTimeChange = (newValue) => {
+    setFormData({ ...formData, time: newValue.format('HH:mm') });
+  };
+
+  const isTimeDisabled = (time) => {
+    // Use formData.date as the date part of the time variable
+    const date = formData.date;
+    const newTime = time.year(date.year())
+      .month(date.month())
+      .date(date.date())
+
+
+    // Use newTime in the rest of the function
+    return unavailableTimeSlots.some((timeSlot) => {
+      const startTime = new Date(timeSlot.start_time);
+      const endTime = new Date(timeSlot.end_time - 60 * 1000);
+      const timeHour = newTime.hour();
+      console.log("date.date: ", date.date());
+      console.log("startTime: ", startTime);
+      console.log("newTime: ", newTime);
+      return (
+        timeHour >= startTime.getHours() &&
+        timeHour <= endTime.getHours() &&
+        newTime.date() === startTime.getDate() &&
+        newTime.month() === startTime.getMonth() &&
+        newTime.year() === startTime.getFullYear()
+      );
+    });
+  };
+
+
   return (
-    <Container maxWidth='md'>
-      <Typography sx={{ textAlign: 'center', marginTop: 3 }} variant='h2'>
+    <Container maxWidth="md">
+      <Typography sx={{ textAlign: 'center', marginTop: 3 }} variant="h2">
         Create Match
       </Typography>
 
@@ -96,35 +154,36 @@ const CreateMatch = () => {
           onChange={(e) => setFormData({ ...formData, field: e.target.value })}
         />
 
-        <TextField
-          fullWidth
-          margin="normal"
-          label="Date"
-          type="date"
-          name="date"
-          InputLabelProps={{
-            shrink: true,
-          }}
-          variant="outlined"
-          required
-          value={formData.date}
-          onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-        />
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DatePicker
+            label="Date"
+            value={formData.date}
+            onChange={(newValue) => {
+              setFormData({ ...formData, date: newValue });
+            }}
+            renderInput={(params) => <TextField {...params} />}
+          />
 
-        <TextField
-          fullWidth
-          margin="normal"
-          label="Time"
-          type="time"
-          name="time"
-          InputLabelProps={{
-            shrink: true,
-          }}
-          variant="outlined"
-          required
-          value={formData.time}
-          onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-        />
+          <TimePicker
+            label="Time"
+            value={formData.time}
+            onChange={handleTimeChange}
+            shouldDisableTime={isTimeDisabled}
+            views={['hours']}
+            ampm={false}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                fullWidth
+                margin="normal"
+                name="time"
+                variant="outlined"
+                required
+              />
+            )}
+          />
+        </LocalizationProvider>
+
         <Button
           type="submit"
           fullWidth
