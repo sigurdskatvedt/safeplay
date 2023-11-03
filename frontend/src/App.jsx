@@ -46,7 +46,6 @@ const App = () => {
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON);
       setUser(user);
-      console.log(user);
     }
   }, []);
 
