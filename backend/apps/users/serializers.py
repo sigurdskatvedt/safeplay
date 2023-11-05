@@ -84,15 +84,25 @@ class RegisterSerializer(UserSerializer):
     last_name = serializers.CharField(max_length=30, required=True)
     user_type = serializers.ChoiceField(
         choices=User.USER_TYPES, required=True)  # Add user_type field
+    guardian_username = serializers.CharField(
+        max_length=150, write_only=True, required=False)
 
     class Meta:
         model = get_user_model()
-        fields = ['id', 'username', 'email', 'password', 'user_type',  # Add 'user_type' to fields list
-                  'team_id', 'birthdate', 'first_name', 'last_name']
+        fields = ['id', 'username', 'email', 'password', 'user_type',
+                  'team_id', 'birthdate', 'first_name', 'last_name', 'guardian_username']
 
     def create(self, validated_data):
         team_id = validated_data.pop('team_id', None)
+        guardian_username = validated_data.pop('guardian_username', None)
         user = get_user_model().objects.create_user(**validated_data)
+
+        if guardian_username:
+            try:
+                guardian = get_user_model().objects.get(username=guardian_username)
+                user.guardian = guardian
+            except get_user_model().DoesNotExist:
+                raise serializers.ValidationError({"guardian_username": "A user with this username does not exist."})
 
         user.is_active = False  # set user to inactive until email is verified
         user.save()
@@ -129,11 +139,20 @@ class RegisterSerializer(UserSerializer):
         password = data.get('password')
         # Custom validation for 'birthday' field based on 'user_type'
         user_type = data.get('user_type')
+        guardian_username = data.get('guardian_username', None)
         birthdate = data.get('birthdate')
 
         if user_type == 'player' and not birthdate:
             raise serializers.ValidationError(
                 {'birthdate': 'This field is required for players.'})
+
+        if user_type == 'player' and guardian_username:
+            try:
+                guardian = get_user_model().objects.get(username=guardian_username)
+                data['guardian'] = guardian
+            except get_user_model().DoesNotExist:
+                raise serializers.ValidationError(
+                    {"guardian_username": "A user with this username does not exist."})
 
         errors = dict()
         try:
@@ -151,7 +170,6 @@ class RegisterSerializer(UserSerializer):
 
 
 class SendNewEmailSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = get_user_model()
         fields = ['email', "username"]

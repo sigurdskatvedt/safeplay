@@ -34,6 +34,8 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
+  const [guardianUsername, setGuardianUsername] = useState("");
+  const [showGuardianField, setShowGuardianField] = useState(false);
   const [emailUsername, setEmailUsername] = useState("");
   const [sendEmail, setSendEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -48,6 +50,17 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
   const [isTeamDialogOpen, setIsTeamDialogOpen] = useState(false);
   const [newTeamName, setNewTeamName] = useState('');
 
+  const calculateAge = (birthdate) => {
+    const today = new Date();
+    const birthDate = new Date(birthdate);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
   useEffect(() => {
     // Make an API call to fetch teams
     AuthService.fetchTeams()
@@ -58,6 +71,11 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
         console.error("Error fetching teams:", error);
       });
   }, []);
+
+  useEffect(() => {
+    const age = calculateAge(birthdate);
+    setShowGuardianField(age < 15);
+  }, [birthdate]);
 
   const handleChangeUserType = (event) => {
     setUserType(event.target.value);
@@ -141,6 +159,7 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
       user_type: userType, // Send the selected user type to the backend
       birthdate: birthdate,
       team_id: currentTeam,
+      guardian_username: showGuardianField ? guardianUsername : undefined,
     };
     AuthService.createUser(request)
       .then((response) => {
@@ -261,17 +280,28 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
               </Box>
             </FormControl>
             {userType === 'player' && (
-              <TextField
-                label="Birthday"
-                type="date"
-                onChange={handleChangeAccountBirth}
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                value={birthdate}
-                required
-              />
-            )}            <TextField
+              <>
+                <TextField
+                  label="Birthday"
+                  type="date"
+                  onChange={handleChangeAccountBirth}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  value={birthdate}
+                  required
+                />
+                {showGuardianField && (
+                  <TextField
+                    required
+                    label="Guardian's Username"
+                    onInput={(e) => setGuardianUsername(e.target.value)}
+                    value={guardianUsername}
+                  />
+                )}
+              </>
+            )}
+            <TextField
               required
               label='First Name'
               onInput={(e) => setFirstName(e.target.value)}
