@@ -31,11 +31,13 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
-        if self.request.user.is_superuser:  # Admin users can see info of every user
+        user = self.request.user
+        if user.is_superuser:
             return get_user_model().objects.all()
+        elif user.user_type == 'guardian':
+            return get_user_model().objects.filter(guardian=user)
         else:
-            # Normal users only see information about themselves
-            return get_user_model().objects.filter(pk=self.request.user.id)
+            return get_user_model().objects.filter(pk=user.id)
 
 
 class RegistrationViewSet(viewsets.ModelViewSet, TokenObtainPairView):

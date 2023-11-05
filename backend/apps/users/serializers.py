@@ -25,7 +25,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
         fields = ['id', 'username', 'email',
-                  'is_staff', 'team_id', 'first_name', 'last_name', 'user_type']
+                  'team_id', 'first_name', 'last_name', 'user_type', 'guardian']
         read_only_fields = ['id']
 
 
@@ -127,6 +127,13 @@ class RegisterSerializer(UserSerializer):
 
         # get the password from the data
         password = data.get('password')
+        # Custom validation for 'birthday' field based on 'user_type'
+        user_type = data.get('user_type')
+        birthdate = data.get('birthdate')
+
+        if user_type == 'player' and not birthdate:
+            raise serializers.ValidationError(
+                {'birthdate': 'This field is required for players.'})
 
         errors = dict()
         try:

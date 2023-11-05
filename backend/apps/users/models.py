@@ -27,6 +27,7 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=30, blank=True, null=True)
     team = models.ForeignKey(
         Team, on_delete=models.SET_NULL, blank=True, null=True, related_name='members')
+    guardian = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='players')
 
 
 def document_directory_path(instance, filename):

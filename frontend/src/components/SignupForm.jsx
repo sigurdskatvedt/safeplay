@@ -40,7 +40,6 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarText, setSnackbarText] = useState("");
   const [snackbarType, setSnackbarType] = useState("success");
-  const [accountType, setAccountType] = React.useState("player");
   const [birthdate, setBirthdate] = React.useState(new Date().toISOString().split('T')[0]);
   const [userType, setUserType] = React.useState("player");
   const [open, setOpen] = useState(false);
@@ -111,10 +110,6 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
 
   const handleResetClose = () => {
     setOpen(false);
-  };
-
-  const handleChangeAccountType = (event) => {
-    setAccountType(event.target.value);
   };
 
   const handleChangeAccountBirth = (event) => {
@@ -229,7 +224,7 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
                     </MenuItem>
                   ))}
                 </Select>
-                {accountType === "manager" && (
+                {userType === "manager" && (
                   <>
                     <IconButton onClick={handleOpenTeamDialog} size="small">
                       <AddIcon />
@@ -265,15 +260,18 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
                 )}
               </Box>
             </FormControl>
-            <TextField
-              label="Birthday"
-              type="date"
-              onChange={handleChangeAccountBirth}
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-            <TextField
+            {userType === 'player' && (
+              <TextField
+                label="Birthday"
+                type="date"
+                onChange={handleChangeAccountBirth}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                value={birthdate}
+                required
+              />
+            )}            <TextField
               required
               label='First Name'
               onInput={(e) => setFirstName(e.target.value)}

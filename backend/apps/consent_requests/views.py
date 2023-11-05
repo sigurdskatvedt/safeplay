@@ -15,12 +15,21 @@ class ConsentRequestViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = ConsentRequest.objects.all()  # Add this line
 
     def get_queryset(self):
-        # Return only the pending requests for the authenticated user
-        return ConsentRequest.objects.filter(user=self.request.user, match__date_time__gte=timezone.now(), request_status="pending")
+        user = self.request.user
+        if user.user_type == 'guardian':
+            print("hello")
+            return ConsentRequest.objects.filter(user__guardian=user, match__date_time__gte=timezone.now(), request_status="pending")
+        else:
+            return ConsentRequest.objects.filter(user=user, match__date_time__gte=timezone.now(), request_status="pending")
 
     def get_past_requests(self):
-        # Return only the past requests for the authenticated user
-        return ConsentRequest.objects.filter(user=self.request.user, match__date_time__lt=timezone.now())
+        user = self.request.user
+        if user.user_type == 'guardian':
+            # Filter past requests where the current user is the guardian of the associated user
+            return ConsentRequest.objects.filter(user__guardian=user, match__date_time__lt=timezone.now())
+        else:
+            # If not a guardian, return the user's own past requests
+            return ConsentRequest.objects.filter(user=user, match__date_time__lt=timezone.now())
 
 
 class AllConsentRequestViewSet(viewsets.ReadOnlyModelViewSet):
@@ -28,48 +37,80 @@ class AllConsentRequestViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = ConsentRequestSerializer
     queryset = ConsentRequest.objects.all()
 
+    def get_queryset(self):
+        user = self.request.user
+        if user.user_type == 'guardian':
+            print("hello")
+            return ConsentRequest.objects.filter(user__guardian=user, match__date_time__gte=timezone.now(), request_status="pending")
+        else:
+            return ConsentRequest.objects.filter(user=user, match__date_time__gte=timezone.now(), request_status="pending")
+
+    def get_past_requests(self):
+        user = self.request.user
+        if user.user_type == 'guardian':
+            # Filter past requests where the current user is the guardian of the associated user
+            return ConsentRequest.objects.filter(user__guardian=user, match__date_time__lt=timezone.now())
+        else:
+            # If not a guardian, return the user's own past requests
+            return ConsentRequest.objects.filter(user=user, match__date_time__lt=timezone.now())
+
 
 class UserConsentRequestViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = ConsentRequestSerializer
 
     def get_queryset(self):
-        return ConsentRequest.objects.filter(match__date_time__gte=timezone.now(), user=self.request.user)
+        user = self.request.user
+        if user.user_type == 'guardian':
+            print("objects: ", ConsentRequest.objects.filter(user__guardian=user))
+            return ConsentRequest.objects.filter(user__guardian=user, match__date_time__gte=timezone.now())
+        else:
+            return ConsentRequest.objects.filter(user=user, match__date_time__gte=timezone.now())
+
+    def get_past_requests(self):
+        user = self.request.user
+        if user.user_type == 'guardian':
+             # Filter past requests where the current user is the guardian of the associated user
+            return ConsentRequest.objects.filter(user__guardian=user, match__date_time__lt=timezone.now())
+        else:
+            # If not a guardian, return the user's own past requests
+            return ConsentRequest.objects.filter(user=user, match__date_time__lt=timezone.now())
 
 
-# TODO: Should not be able to set in the past
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def approve_request(request, request_id):
-    # Check if the user is a guardian
-    if request.user.user_type != 'guardian':
-        return Response({"error": "Only guardians can approve requests.",   "error_code": "not_guardian"}, status=403)
+    user = request.user
+    if user.user_type != 'guardian':
+        return Response({"error": "Only guardians can approve requests.", "error_code": "not_guardian"}, status=403)
 
     try:
+        # Check if the consent request is for a player under the guardianship of the current user
         consent_request = ConsentRequest.objects.get(
-            id=request_id, user=request.user)
+            id=request_id, user__guardian=user)
         consent_request.request_status = "accepted"
         consent_request.save()
         return Response({"message": "Request approved successfully."}, status=200)
     except ConsentRequest.DoesNotExist:
-        return Response({"error": "Request not found."}, status=404)
-
+        return Response({"error": "Request not found or you are not the guardian of the player."}, status=404)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def remove_approval(request, request_id):
-    # Check if the user is a guardian
-    if request.user.user_type != 'guardian':
-        return Response({"error": "Only guardians can approve requests.",   "error_code": "not_guardian"}, status=403)
+    user = request.user
+    if user.user_type != 'guardian':
+        return Response({"error": "Only guardians can remove approvals.", "error_code": "not_guardian"}, status=403)
 
     try:
+        # Check if the consent request is for a player under the guardianship of the current user
         consent_request = ConsentRequest.objects.get(
-            id=request_id, user=request.user)
+            id=request_id, user__guardian=user)
         consent_request.request_status = "declined"
         consent_request.save()
         return Response({"message": "Approval removed successfully."}, status=200)
     except ConsentRequest.DoesNotExist:
-        return Response({"error": "Request not found."}, status=404)
+        return Response({"error": "Request not found or you are not the guardian of the player."}, status=404)
+
 
 
 @api_view(['GET'])

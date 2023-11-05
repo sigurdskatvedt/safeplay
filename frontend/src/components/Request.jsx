@@ -92,8 +92,8 @@ const ConsentRequestCard = ({ consentRequest, update, OpenSnackbar }) => {
         </Typography>
 
         <Stack direction="row" alignItems="center" spacing={1}>
-          <Typography variant='body2' color={consentRequest.is_approved ? 'success.main' : 'error.main'} sx={{ mt: 1 }}>
-            {consentRequest.is_approved ? 'Approved' : 'Not Approved'}
+          <Typography variant='body2' color={consentRequest.request_status === "accepted" ? 'success.main' : 'error.main'} sx={{ mt: 1 }}>
+            {consentRequest.request_status === "accepted" ? 'Accepted' : 'Not Approved'}
           </Typography>
           <Switch
             checked={consentRequest.is_approved}
