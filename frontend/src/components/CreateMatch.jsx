@@ -29,6 +29,9 @@ const CreateMatch = () => {
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
   });
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarStyle, setSnackbarStyle] = useState({});
+
 
   useEffect(() => {
     AuthService.fetchTeams()
@@ -49,6 +52,7 @@ const CreateMatch = () => {
             start_time: dayjs(timeSlot.start_time),
             end_time: dayjs(timeSlot.end_time),
           }));
+          console.log(response);
           setUnavailableTimeSlots(parsedResponse);
         })
         .catch((error) => {
@@ -73,19 +77,25 @@ const CreateMatch = () => {
       team2: formData.team2,
       field: formData.field,
       date_time: dateTime,
-      // include other fields as necessary
     };
 
     MatchesService.AddMatch(dataToSubmit)
       .then((response) => {
         console.log('Match added successfully:', response);
-        // Handle success
+        // Update snackbar for success
+        setSnackbarMessage('Match added successfully');
+        setSnackbarStyle({ backgroundColor: 'green' });
+        setSnackbarOpen(true);
       })
       .catch((error) => {
         console.error('Error adding match:', error);
-        // Handle error
+        // Update snackbar for failure
+        setSnackbarMessage('Request failed');
+        setSnackbarStyle({ backgroundColor: 'red' });
+        setSnackbarOpen(true);
       });
   };
+
   const handleTimeChange = (newValue) => {
     setFormData({ ...formData, time: newValue.format('HH:mm') });
   };
@@ -217,7 +227,12 @@ const CreateMatch = () => {
         open={snackbarOpen}
         autoHideDuration={6000}
         onClose={handleCloseSnackbar}
-        message="Please fill out all fields before submitting."
+        message={snackbarMessage}
+        ContentProps={{ style: snackbarStyle }}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center',
+        }}
       />
     </Container>
   );

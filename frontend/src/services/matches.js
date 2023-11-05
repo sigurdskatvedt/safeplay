@@ -5,14 +5,14 @@ const GetMatches = () => {
   return request.then((response) => response.data);
 };
 
-const AddMatch = (matchData) => {
-  const request = api.post("/matches/", matchData);
+const CreateMatch = (matchData) => {
+  const request = api.post("/create_match/", matchData);
   return request.then((response) => response.data);
 };
 
 const MatchesService = {
   GetMatches,
-  AddMatch,
+  AddMatch: CreateMatch,
 };
 
 export default MatchesService;

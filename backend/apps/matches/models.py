@@ -2,7 +2,9 @@
 
 from django.db import models
 from apps.teams.models import Team
+from apps.fields.models import Booking
 from apps.consent_requests.models import ConsentRequest
+
 
 class Match(models.Model):
     team1 = models.ForeignKey(
@@ -10,6 +12,8 @@ class Match(models.Model):
     team2 = models.ForeignKey(
         Team, related_name='away_matches', on_delete=models.CASCADE)
     date_time = models.DateTimeField()
+    booking = models.ForeignKey(
+        Booking, related_name='matches', on_delete=models.CASCADE)
 
     def save(self, *args, **kwargs):
         is_new = not self.pk  # Check if this is a new match
@@ -19,4 +23,3 @@ class Match(models.Model):
             for team in [self.team1, self.team2]:
                 for user in team.members.all():
                     ConsentRequest.objects.create(user=user, match=self)
-
