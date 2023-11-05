@@ -1,7 +1,7 @@
 // frontend/src/components/PrivacyNotice.jsx
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, Typography, CircularProgress } from "@mui/material";
+import { Card, CardContent, Typography, CircularProgress, Box } from '@mui/material';
 import FieldsService from '../services/fields';
 
 const PrivacyNotice = () => {
@@ -22,6 +22,27 @@ const PrivacyNotice = () => {
       });
   }, []);
 
+  const fieldsInUseText = fieldsInUse.map(field => field.field_name).join(', ');
+
+  const privacyCards = [
+    {
+      header: 'Video Usage',
+      text: 'Performance analysis, For family of teams to see',
+    },
+    {
+      header: 'Viewership',
+      text: 'Authorized staff and security personnel, Team coaches and officials',
+    },
+    {
+      header: 'Data Storage',
+      text: 'The video data will be stored securely and retained for a period of 12 months',
+    },
+    {
+      header: 'More Information',
+      text: 'For more information contact: ola.nordmann@gmail.com',
+    },
+  ];
+
   if (loading) {
     return <CircularProgress />;
   }
@@ -31,34 +52,30 @@ const PrivacyNotice = () => {
   }
 
   return (
-    <div>
-      <Card>
+    <Box display="flex" flexDirection="column" alignItems="center" mt={2}>
+      <Card style={{ width: '100%', maxWidth: 400, marginBottom: '1rem' }}>
         <CardContent>
-          <Typography variant="h5" component="h2">
-            Fields Currently in Use
+          <Typography variant="h6" component="h3" align="center" fontWeight="bold">
+            Field
           </Typography>
-          {fieldsInUse.length > 0 ? (
-            fieldsInUse.map((field, index) => (
-              <Card key={index}>
-                <CardContent>
-                  <Typography color="textSecondary" gutterBottom>
-                    Field Name: {field.field_name}
-                  </Typography>
-                  <Typography variant="body2" component="p">
-                    Field ID: {field.field_id}
-                  </Typography>
-                </CardContent>
-              </Card>
-            ))
-          ) : (
-            <Typography variant="body2" component="p">
-              No fields are currently in use.
-            </Typography>
-          )}
+          <Typography variant="body2" align="center" style={{ whiteSpace: 'pre-line' }}>
+            {fieldsInUse.length > 0 ? `Fields in use: ${fieldsInUseText}` : 'No fields are currently in use.'}
+          </Typography>
         </CardContent>
       </Card>
-      {/* Additional cards for other privacy concerns can be added here */}
-    </div>
+      {privacyCards.map((card, index) => (
+        <Card key={index} style={{ width: '100%', maxWidth: 400, marginBottom: '1rem' }}>
+          <CardContent>
+            <Typography variant="h6" component="h3" align="center" fontWeight="bold">
+              {card.header}
+            </Typography>
+            <Typography variant="body2" align="center" style={{ whiteSpace: 'pre-line' }}>
+              {card.text}
+            </Typography>
+          </CardContent>
+        </Card>
+      ))}
+    </Box>
   );
 };
 
