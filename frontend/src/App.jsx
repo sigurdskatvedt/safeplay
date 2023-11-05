@@ -18,6 +18,7 @@ import ResetPassword from "./components/ResetPassword";
 import Verified from "./components/Verified";
 import Invalid from "./components/Invalid";
 import Object from "./components/Object";
+import PrivacyNotice from './components/PrivacyNotice';
 import AuthService from "./services/auth";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
@@ -87,6 +88,13 @@ const App = () => {
                 </Button>
               </Grid>
             ) : null}
+            {user && (
+              <Grid item marginTop={0.8}>
+                <Button color='inherit' component={Link} to='/privacy-notice'>
+                  Privacy Notice
+                </Button>
+              </Grid>
+            )}
           </Grid>
           <Grid container justifyContent='flex-end'>
             <Grid item>
@@ -157,6 +165,7 @@ const App = () => {
           <Route path='/new_password' element={<ResetPassword />} />
 
           <Route path='/object' element={<Object />} />
+          <Route path='/privacy-notice' element={<PrivacyNotice />} />
 
           <Route path='/' element={<Home setUser={setUser} />} />
         </Routes>

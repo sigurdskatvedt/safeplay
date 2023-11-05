@@ -9,6 +9,8 @@ from django.shortcuts import get_object_or_404
 from .serializers import BookingSerializer
 from .models import Field, Booking
 from django.utils.dateparse import parse_datetime
+from django.utils import timezone  # Correct import for timezone
+
 
 
 class BookingsView(APIView):
@@ -66,3 +68,24 @@ class FieldBookingsView(APIView):
             field=field, start_time__gte=start_time, end_time__lte=end_time)
         serializer = BookingSerializer(bookings, many=True)
         return Response(serializer.data)
+
+
+class CurrentFieldsView(APIView):
+    """
+    API endpoint that returns all fields that are currently in use.
+    """
+    def get(self, request):
+        # Get the current time
+        now = timezone.now()
+
+        # Query for bookings that are currently active
+        current_bookings = Booking.objects.filter(start_time__lte=now, end_time__gte=now)
+
+        # Get the fields related to these bookings
+        current_fields = Field.objects.filter(booking__in=current_bookings).distinct()
+
+        # Serialize the field data
+        field_data = [{'field_id': field.id, 'field_name': field.name} for field in current_fields]
+
+        # Return the response
+        return Response(field_data)

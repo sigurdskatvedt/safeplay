@@ -12,8 +12,18 @@ const FetchAvailableTimeSlots = (fieldId, date, timezone) => {
   return request.then((response) => response.data);
 };
 
+const FetchFieldsInUse = () => {
+  return api.get('fields/current-use/')
+    .then((response) => response.data)
+    .catch((error) => {
+      console.error("Error fetching fields in use:", error);
+      throw error;
+    });
+};
+
 const FieldsService = {
   FetchAvailableTimeSlots,
+  FetchFieldsInUse, // Add the new function to the exported service object
 };
 
 export default FieldsService;
