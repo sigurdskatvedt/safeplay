@@ -87,6 +87,7 @@ INSTALLED_APPS = [
     'apps.matches',
     'apps.consent_requests',
     'apps.fields',
+    'apps.objections',
 ]
 
 MIDDLEWARE = [

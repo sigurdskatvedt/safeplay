@@ -1,6 +1,8 @@
 import { Box, Stack, Typography, Snackbar, TextField, Button } from "@mui/material";
 import React, { useState } from "react";
 import MuiAlert from "@mui/material/Alert";
+import ObjectionsService from '../services/objections';
+
 
 const Object = () => {
   const [objectionText, setObjectionText] = useState("");
@@ -26,9 +28,26 @@ const Object = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Here you'd handle the objection submission logic, uploading files, sending the text, etc.
-    console.log(objectionText);
-    console.log(selectedFile);
+
+    // Create a FormData object to hold the text and file
+    const formData = new FormData();
+    formData.append('text', objectionText);
+    if (selectedFile) {
+      formData.append('document', selectedFile);
+    }
+
+    // Use the AddNewObjection service to send the data
+    ObjectionsService.AddNewObjection(formData)
+      .then(() => {
+        OpenSnackbar('Objection submitted successfully!');
+        // Clear the form
+        setObjectionText('');
+        setSelectedFile(null);
+      })
+      .catch((error) => {
+        console.error('Error submitting objection:', error);
+        OpenSnackbar('Error submitting objection. Please try again.');
+      });
   };
 
   return (
