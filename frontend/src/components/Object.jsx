@@ -1,7 +1,6 @@
 import { Box, Stack, Typography, Snackbar, TextField, Button } from "@mui/material";
 import React, { useState } from "react";
 import MuiAlert from "@mui/material/Alert";
-import DocumentService from "../services/documents";
 
 const Object = () => {
   const [objectionText, setObjectionText] = useState("");

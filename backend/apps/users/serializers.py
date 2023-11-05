@@ -11,7 +11,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from django.conf import settings
-from .models import User, Document, Team
+from .models import User, Team
 from rest_framework.exceptions import AuthenticationFailed
 from django.utils.encoding import force_bytes, force_str
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
@@ -206,35 +206,3 @@ class SetNewPasswordSerializer(serializers.Serializer):
         user.save()
 
         return user
-
-
-class DocumentPostSerializer(serializers.ModelSerializer):
-    """
-    Serializer for the upload Documents.
-    """
-    class Meta:
-        model = Document
-        fields = ('id', 'document')
-
-
-class DocumentGetSerializer(serializers.ModelSerializer):
-    """
-    Serializer for the download of Documents.
-    """
-    link = serializers.SerializerMethodField()  # link to download the document
-    name = serializers.SerializerMethodField()  # name of the document
-
-    class Meta:
-        model = Document
-        fields = ('id', 'user', 'link', 'name')
-
-    def get_link(self, obj):  # get the link to download the document
-        domain = get_current_site(self.context["request"])
-        link = reverse('document-download', kwargs={"pk": obj.id})
-
-        link = f"{settings.PROTOCOL}://{domain}{link}"
-        return link
-
-    def get_name(self, obj):
-        # name is stored as documents/id/filename, so splitting and selecting last item gets only the filename.
-        return obj.document.name.split('/')[-1]

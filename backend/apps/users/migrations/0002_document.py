@@ -18,7 +18,6 @@ class Migration(migrations.Migration):
             name='Document',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('document', models.FileField(upload_to=apps.users.models.document_directory_path, validators=[apps.users.validators.FileValidator(allowed_extensions='', allowed_mimetypes='', max_size=5242880)])),
                 ('date_uploaded', models.DateTimeField(auto_now_add=True)),
                 ('content_type', models.CharField(max_length=64)),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='documents', to=settings.AUTH_USER_MODEL)),

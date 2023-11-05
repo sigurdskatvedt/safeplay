@@ -10,7 +10,6 @@ router.register('api/users', views.UserViewSet, basename='users')
 router.register('api/register', views.RegistrationViewSet, basename='register')
 router.register('api/login', views.LoginViewSet, basename='login')
 router.register('api/refresh', views.RefreshViewSet, basename='refresh')
-router.register('api/documents', views.DocumentViewSet, basename='documents')
 
 urlpatterns = [*router.urls,
                path("api/verify-email/<uid>/<token>/",  # Added token to path

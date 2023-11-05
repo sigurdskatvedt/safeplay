@@ -11,15 +11,9 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.conf import settings
 from django.core.mail import EmailMessage
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.encoding import force_bytes, force_str
-from .models import Document
-from rest_framework.parsers import MultiPartParser, FormParser
-from django.http import HttpResponse, HttpResponseNotFound
-from django.core.exceptions import PermissionDenied
-from .permissions import DocumentPermission
 from datetime import datetime, timedelta, timezone
 
 
@@ -217,70 +211,3 @@ class SetNewPasswordView(generics.GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         return Response({'success': True, 'message': 'Password reset success'}, status=status.HTTP_200_OK)
-
-
-class DocumentViewSet(viewsets.ModelViewSet):
-    """ViewSet for the Document model"""
-
-    queryset = Document.objects.all()
-
-    permission_classes = [DocumentPermission]
-    parser_classes = [MultiPartParser, FormParser]
-
-    http_method_names = ['get', 'head', 'post', 'delete']
-
-    # Return different serializers for different actions
-    def get_serializer_class(self):
-        if self.action == 'create':
-            return DocumentPostSerializer
-
-        return DocumentGetSerializer
-
-    def perform_create(self, serializer):
-        serializer.save(
-            content_type=self.request.data.get('document').content_type, user=self.request.user)
-
-    def get_queryset(self):
-        return Document.objects.filter(user=self.request.user)
-
-
-# class GetDocumentsForRefugeeView(generics.GenericAPIView):
-#     """View for getting documents for a refugee, if the user is a volunteer for the refugee"""
-#     serializer_class = DocumentGetSerializer
-#
-#     def get(self, request, refugee_username):
-#
-#         user = request.user
-#         refugee = get_user_model().objects.filter(username=refugee_username).first()
-#         if refugee:
-#             requests = HelpRequest.objects.filter(volunteer=user)
-#             # Check if the user is a volunteer for the refugee
-#             if requests.filter(refugee=refugee).exists():
-#                 documents = Document.objects.filter(user=refugee)
-#                 serializer = self.serializer_class(
-#                     documents, many=True, context={'request': request})
-#                 return Response(serializer.data, status=status.HTTP_200_OK)
-#         return Response(status=status.HTTP_403_FORBIDDEN)
-
-
-# class DocumentDownloadView(generics.GenericAPIView):
-#     """View for downloading a document"""
-#     permission_classes = [permissions.IsAuthenticated]
-#
-#     def get(self, request, pk):
-#         try:
-#             document = Document.objects.get(pk=pk)
-#         except:
-#             return HttpResponseNotFound('<h1>File not found :(</h1>')
-#         user = request.user
-#         owner = document.user
-#         requests = HelpRequest.objects.filter(volunteer=user)
-#         refugees = map(lambda x: x.refugee, requests)
-#         # Check if the user is the owner of the document or a volunteer for the refugee
-#         if user == owner or owner in refugees or user.is_staff:
-#             response = HttpResponse(
-#                 document.document, content_type=document.content_type)
-#             return response
-#         else:
-#             raise PermissionDenied(
-#                 {"Message": "You do not have permission to access this file."})
