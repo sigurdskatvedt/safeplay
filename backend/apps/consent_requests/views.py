@@ -16,7 +16,7 @@ class ConsentRequestViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         # Return only the pending requests for the authenticated user
-        return ConsentRequest.objects.filter(user=self.request.user, match__date_time__gte=timezone.now(), is_approved=False)
+        return ConsentRequest.objects.filter(user=self.request.user, match__date_time__gte=timezone.now(), request_status="pending")
 
     def get_past_requests(self):
         # Return only the past requests for the authenticated user
@@ -48,7 +48,7 @@ def approve_request(request, request_id):
     try:
         consent_request = ConsentRequest.objects.get(
             id=request_id, user=request.user)
-        consent_request.is_approved = True
+        consent_request.request_status = "accepted"
         consent_request.save()
         return Response({"message": "Request approved successfully."}, status=200)
     except ConsentRequest.DoesNotExist:
@@ -65,7 +65,7 @@ def remove_approval(request, request_id):
     try:
         consent_request = ConsentRequest.objects.get(
             id=request_id, user=request.user)
-        consent_request.is_approved = False
+        consent_request.request_status = "declined"
         consent_request.save()
         return Response({"message": "Approval removed successfully."}, status=200)
     except ConsentRequest.DoesNotExist:

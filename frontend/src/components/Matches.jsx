@@ -21,38 +21,39 @@ const Matches = () => {
       const matchesData = await MatchesService.GetMatches();
       console.log(matchesData); // Log the fetched matches data
 
-      const upcomingMatches = matchesData.filter(match => match.date_time > new Date().toISOString()).map(match => {
-        const accepted = match.consent_requests.filter(request => request.is_approved).length;
-        const declined = match.consent_requests.filter(request => !request.is_approved).length;
+      const upcomingMatches = matchesData.filter(match => new Date(match.date_time) > new Date()).map(match => {
+        const pending = match.consent_requests.filter(request => request.request_status === 'pending').length;
+        const accepted = match.consent_requests.filter(request => request.request_status === 'accepted').length;
+        const declined = match.consent_requests.filter(request => request.request_status === 'declined').length;
 
         return {
           id: match.id,
           teams: `${match.team1.name} vs ${match.team2.name}`,
           date: match.date_time,
+          pending: pending,
           accepted: accepted,
           declined: declined,
         };
       });
 
-      const finishedMatches = matchesData.filter(match => match.date_time <= new Date().toISOString()).map(match => {
-        const accepted = match.consent_requests.filter(
-          (request) => request.is_approved
-        ).length;
-        const declined = match.consent_requests.filter(
-          (request) => !request.is_approved
-        ).length;
-        const status = declined === 0 ? "OK" : "Not approved";
+      const finishedMatches = matchesData.filter(match => new Date(match.date_time) <= new Date()).map(match => {
+        const pending = match.consent_requests.filter(request => request.request_status === 'pending').length;
+        const accepted = match.consent_requests.filter(request => request.request_status === 'accepted').length;
+        const declined = match.consent_requests.filter(request => request.request_status === 'declined').length;
+
+        const totalRequests = match.consent_requests.length;
+        const status = accepted === totalRequests ? "OK" : "Not Approved";
 
         return {
           id: match.id,
           teams: `${match.team1.name} vs ${match.team2.name}`,
           date: match.date_time,
+          pending: pending,
           accepted: accepted,
           declined: declined,
           status: status,
         };
       });
-
 
       setUpcomingMatches(upcomingMatches);
       setFinishedMatches(finishedMatches);
@@ -80,7 +81,7 @@ const Matches = () => {
             <TableRow>
               <TableCell sx={{ fontWeight: "bold" }}>Teams Involved</TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>Date & Time</TableCell>
-              {/* <TableCell sx={{ fontWeight: 'bold' }}>Pending</TableCell> */}
+              <TableCell sx={{ fontWeight: "bold" }}>Pending</TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>Accepted</TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>Declined</TableCell>
             </TableRow>
@@ -90,7 +91,7 @@ const Matches = () => {
               <TableRow key={match.id}>
                 <TableCell>{match.teams}</TableCell>
                 <TableCell>{match.date}</TableCell>
-                {/* <TableCell>{match.pending}</TableCell> */}
+                <TableCell>{match.pending}</TableCell>
                 <TableCell>{match.accepted}</TableCell>
                 <TableCell>{match.declined}</TableCell>
               </TableRow>
@@ -108,10 +109,9 @@ const Matches = () => {
             <TableRow>
               <TableCell sx={{ fontWeight: "bold" }}>Teams Involved</TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>Date & Time</TableCell>
-              {/* <TableCell sx={{ fontWeight: 'bold' }}>Pending</TableCell> */}
+              <TableCell sx={{ fontWeight: "bold" }}>Pending</TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>Accepted</TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>Declined</TableCell>
-              {/* <TableCell sx={{ fontWeight: 'bold' }}>Withdrawn</TableCell> */}
               <TableCell sx={{ fontWeight: "bold" }}>Status</TableCell>
             </TableRow>
           </TableHead>
@@ -120,10 +120,9 @@ const Matches = () => {
               <TableRow key={match.id}>
                 <TableCell>{match.teams}</TableCell>
                 <TableCell>{match.date}</TableCell>
-                {/* <TableCell>{match.pending}</TableCell> */}
+                <TableCell>{match.pending}</TableCell>
                 <TableCell>{match.accepted}</TableCell>
                 <TableCell>{match.declined}</TableCell>
-                {/* <TableCell>{match.withdrawn}</TableCell> */}
                 <TableCell>{match.status}</TableCell>
               </TableRow>
             ))}
