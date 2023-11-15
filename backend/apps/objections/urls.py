@@ -1,6 +1,12 @@
 from django.urls import path
 from . import views
+from rest_framework.routers import DefaultRouter
 
-urlpatterns = [
-    path('create/', views.create_objection, name='create_objection'),
-]
+
+router = DefaultRouter()
+
+router.register('api/objection', views.ObjectionViewSet, basename='objection')
+
+urlpatterns = [*router.urls]
+
+
