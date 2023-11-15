@@ -21,9 +21,19 @@ const FetchFieldsInUse = () => {
     });
 };
 
+const FetchAllFields = () => {
+  return api.get('fields/')  // Adjust the URL based on your Django URL configuration
+    .then((response) => response.data)
+    .catch((error) => {
+      console.error("Error fetching all fields:", error);
+      throw error;
+    });
+};
+
 const FieldsService = {
   FetchAvailableTimeSlots,
   FetchFieldsInUse, // Add the new function to the exported service object
+  FetchAllFields,
 };
 
 export default FieldsService;

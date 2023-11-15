@@ -3,10 +3,10 @@ import pytz
 from datetime import datetime, date, time
 from dateutil.parser import isoparse
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, generics
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
-from .serializers import BookingSerializer
+from .serializers import BookingSerializer, FieldSerializer
 from .models import Field, Booking
 from django.utils.dateparse import parse_datetime
 from django.utils import timezone  # Correct import for timezone
@@ -40,6 +40,9 @@ class BookFieldView(APIView):
             field=field, start_time=start_time, end_time=end_time)
         return Response({'message': 'Field booked successfully', 'booking_id': new_booking.id})
 
+class FieldListView(generics.ListAPIView):
+    queryset = Field.objects.all()
+    serializer_class = FieldSerializer
 
 class FieldBookingsView(APIView):
     def get(self, request, field_id):

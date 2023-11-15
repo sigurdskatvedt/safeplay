@@ -8,6 +8,9 @@ import {
   Button,
   MenuItem,
   Grid,
+  Select,
+  InputLabel,
+  FormControl
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -32,6 +35,7 @@ const CreateMatch = () => {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarStyle, setSnackbarStyle] = useState({});
 
+  const [fields, setFields] = useState([]); // State to store fields data
 
   useEffect(() => {
     AuthService.fetchTeams()
@@ -40,6 +44,14 @@ const CreateMatch = () => {
       })
       .catch((error) => {
         console.error('Error fetching teams:', error);
+      });
+
+    FieldsService.FetchAllFields()
+      .then((response) => {
+        setFields(response); // Set the fields data
+      })
+      .catch((error) => {
+        console.error('Error fetching fields:', error);
       });
   }, []);
 
@@ -161,15 +173,22 @@ const CreateMatch = () => {
           ))}
         </TextField>
 
-        <TextField
-          fullWidth
-          margin="normal"
-          label="Field"
-          name="field"
-          variant="outlined"
-          value={formData.field}
-          onChange={(e) => setFormData({ ...formData, field: e.target.value })}
-        />
+        <FormControl fullWidth margin="normal">
+          <InputLabel id="field-label">Field</InputLabel>
+          <Select
+            labelId="field-label"
+            id="field"
+            value={formData.field}
+            label="Field"
+            onChange={(e) => setFormData({ ...formData, field: e.target.value })}
+          >
+            {fields.map((field) => (
+              <MenuItem key={field.id} value={field.id}>
+                {field.name} {/* Assuming each field has an id and name */}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
 
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <Grid container spacing={2} sx={{ width: '100%' }}>

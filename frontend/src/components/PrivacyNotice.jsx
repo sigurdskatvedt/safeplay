@@ -59,7 +59,7 @@ const PrivacyNotice = () => {
             Field
           </Typography>
           <Typography variant="body2" align="center" style={{ whiteSpace: 'pre-line' }}>
-            {fieldsInUse.length > 0 ? `Fields in use: ${fieldsInUseText}` : 'No fields are currently in use.'}
+            {fieldsInUse.length > 0 ? `Fields currently in use: ${fieldsInUseText}` : 'No fields are currently in use.'}
           </Typography>
         </CardContent>
       </Card>
