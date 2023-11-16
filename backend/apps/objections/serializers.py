@@ -7,7 +7,7 @@ from django.conf import settings
 class ObjectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Objection
-        fields = ('id', 'document')
+        fields = ('id', 'document', "name", "text")
 
 class ObjectionPostSerializer(serializers.ModelSerializer):
     """
@@ -15,7 +15,7 @@ class ObjectionPostSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Objection
-        fields = ('id', 'document')
+        fields = ('id', 'document', "name", "text")
 
 
 class ObjectionGetSerializer(serializers.ModelSerializer):

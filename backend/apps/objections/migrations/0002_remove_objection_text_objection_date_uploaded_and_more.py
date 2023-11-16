@@ -22,6 +22,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='objection',
             name='document',
-            field=models.FileField(upload_to=apps.objections.models.document_directory_path, validators=[apps.objections.validators.FileValidator(allowed_extensions='', allowed_mimetypes='', max_size=5242880)]),
+            field=models.FileField(upload_to="objections/", validators=[apps.objections.validators.FileValidator(allowed_extensions='', allowed_mimetypes='', max_size=5242880)]),
         ),
     ]

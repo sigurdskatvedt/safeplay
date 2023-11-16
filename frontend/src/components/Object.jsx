@@ -29,10 +29,16 @@ const Object = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    const fileName = `${(new Date()).toISOString()}`
+    console.log(fileName)
     // Create a FormData object to hold the text and file
     const formData = new FormData();
+    formData.append("name", fileName)
+    if (objectionText) {
+      formData.append("text", objectionText)
+    }
     if (selectedFile) {
-      formData.append('objection', selectedFile);
+      formData.append('document', selectedFile);
     }
 
     // Use the AddNewObjection service to send the data
