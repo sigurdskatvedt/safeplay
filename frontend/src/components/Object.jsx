@@ -59,6 +59,9 @@ const Object = () => {
     <>
       <Stack alignItems='center' spacing={1} marginTop={2}>
         <Typography variant='h2'>Submit Your Objections</Typography>
+        <Typography variant='h6' style={{ textAlign: 'center' }}>
+          Add objections if you want to contact administrators regarding any issues or objections with the service.
+        </Typography>
 
         <Typography variant='h5'>Your Objection:</Typography>
         <TextField

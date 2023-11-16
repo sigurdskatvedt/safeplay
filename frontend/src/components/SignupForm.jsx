@@ -37,6 +37,7 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
   const [emailUsername, setEmailUsername] = useState("");
   const [sendEmail, setSendEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState(""); // New state variable for confirm password
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarText, setSnackbarText] = useState("");
   const [snackbarType, setSnackbarType] = useState("success");
@@ -102,6 +103,13 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
 
   const onSubmit = (e) => {
     e.preventDefault();
+
+    if (password !== confirmPassword) {
+      setSnackbarText("Passwords do not match.");
+      setSnackbarType("error");
+      setSnackbarOpen(true);
+      return; // Prevent form submission
+    }
 
     const request = {
       username: username,
@@ -252,7 +260,14 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
               type='password'
               onInput={(e) => setPassword(e.target.value)}
               value={password}
-            ></TextField>
+            />
+            <TextField
+              required
+              label='Confirm Password'
+              type='password'
+              onInput={(e) => setConfirmPassword(e.target.value)}
+              value={confirmPassword}
+            />
             <Button variant='contained' type='submit'>
               Sign Up
             </Button>

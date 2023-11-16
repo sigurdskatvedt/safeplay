@@ -13,7 +13,7 @@ const FetchAvailableTimeSlots = (fieldId, date, timezone) => {
 };
 
 const FetchFieldsInUse = () => {
-  return api.get('fields/current-use/')
+  return api.get('current-use/')
     .then((response) => response.data)
     .catch((error) => {
       console.error("Error fetching fields in use:", error);

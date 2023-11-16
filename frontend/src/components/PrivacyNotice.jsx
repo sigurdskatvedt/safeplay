@@ -26,12 +26,16 @@ const PrivacyNotice = () => {
 
   const privacyCards = [
     {
+      header: 'Filming',
+      text: 'Matches are filmed to be watched by authorized users such as managers or guardians.'
+    },
+    {
       header: 'Video Usage',
-      text: 'Performance analysis, For family of teams to see',
+      text: 'Performance analysis\nFor family of teams to see',
     },
     {
       header: 'Viewership',
-      text: 'Authorized staff and security personnel, Team coaches and officials',
+      text: 'Authorized staff and security personnel\nTeam coaches and officials',
     },
     {
       header: 'Data Storage',
@@ -40,8 +44,7 @@ const PrivacyNotice = () => {
     {
       header: 'More Information',
       text: 'For more information contact: ola.nordmann@gmail.com',
-    },
-  ];
+    },];
 
   if (loading) {
     return <CircularProgress />;

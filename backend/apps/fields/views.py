@@ -12,7 +12,6 @@ from django.utils.dateparse import parse_datetime
 from django.utils import timezone  # Correct import for timezone
 
 
-
 class BookingsView(APIView):
     def get(self, request):
         bookings = Booking.objects.all()
@@ -40,9 +39,11 @@ class BookFieldView(APIView):
             field=field, start_time=start_time, end_time=end_time)
         return Response({'message': 'Field booked successfully', 'booking_id': new_booking.id})
 
+
 class FieldListView(generics.ListAPIView):
     queryset = Field.objects.all()
     serializer_class = FieldSerializer
+
 
 class FieldBookingsView(APIView):
     def get(self, request, field_id):
@@ -77,18 +78,22 @@ class CurrentFieldsView(APIView):
     """
     API endpoint that returns all fields that are currently in use.
     """
+
     def get(self, request):
         # Get the current time
         now = timezone.now()
 
         # Query for bookings that are currently active
-        current_bookings = Booking.objects.filter(start_time__lte=now, end_time__gte=now)
+        current_bookings = Booking.objects.filter(
+            start_time__lte=now, end_time__gte=now)
 
         # Get the fields related to these bookings
-        current_fields = Field.objects.filter(booking__in=current_bookings).distinct()
+        current_fields = Field.objects.filter(
+            booking__in=current_bookings).distinct()
 
         # Serialize the field data
-        field_data = [{'field_id': field.id, 'field_name': field.name} for field in current_fields]
+        field_data = [{'field_id': field.id, 'field_name': field.name}
+                      for field in current_fields]
 
         # Return the response
         return Response(field_data)
