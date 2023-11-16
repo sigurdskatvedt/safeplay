@@ -18,6 +18,7 @@ import ResetPassword from "./components/ResetPassword";
 import Verified from "./components/Verified";
 import Invalid from "./components/Invalid";
 import Object from "./components/Object";
+import TeamCreation from "./components/TeamCreation";
 import PrivacyNotice from './components/PrivacyNotice';
 import AuthService from "./services/auth";
 
@@ -68,11 +69,18 @@ const App = () => {
               </Grid>
             ) : null}
             {user?.user_type === 'manager' ? (  // Updated condition
-              <Grid item marginTop={0.8}>
-                <Button color='inherit' component={Link} to='/creatematch'>
-                  Create New Match
-                </Button>
-              </Grid>
+              <>
+                <Grid item marginTop={0.8}>
+                  <Button color='inherit' component={Link} to='/create-match'>
+                    Create New Match
+                  </Button>
+                </Grid>
+                <Grid item marginTop={0.8}>
+                  <Button color='inherit' component={Link} to='/create-team'>
+                    Create New Team
+                  </Button>
+                </Grid>
+              </>
             ) : null}
             {user?.id ? (
               <Grid item marginTop={0.8}>
@@ -133,7 +141,7 @@ const App = () => {
             element={<Matches user={user} />}
           />
           <Route
-            path='/creatematch'
+            path='/create-match'
             element={<CreateMatch user={user} />}
           />
           <Route path='/consent-requests' element={<ConsentRequests user={user} />} />
@@ -166,6 +174,7 @@ const App = () => {
 
           <Route path='/object' element={<Object />} />
           <Route path='/privacy-notice' element={<PrivacyNotice />} />
+          <Route path='/create-team' element={<TeamCreation />} />
 
           <Route path='/' element={<Home setUser={setUser} />} />
         </Routes>

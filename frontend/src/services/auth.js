@@ -13,8 +13,8 @@ const createUser = (credentials) => {
   });
 };
 
-const createTeam = (teamName) => {
-  return api.post(`/teams/`, { name: teamName }).then((response) => {
+const createTeam = (request) => {
+  return api.post(`/teams/`, { name: request.name, description: request.description }).then((response) => {
     return response.data;
   });
 };

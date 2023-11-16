@@ -20,8 +20,6 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
-import IconButton from "@mui/material/IconButton";
-import AddIcon from '@mui/icons-material/Add';
 import Box from "@mui/material/Box";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
@@ -47,8 +45,6 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
   const [open, setOpen] = useState(false);
   const [currentTeam, setCurrentTeam] = useState("");
   const [teams, setTeams] = useState([]);
-  const [isTeamDialogOpen, setIsTeamDialogOpen] = useState(false);
-  const [newTeamName, setNewTeamName] = useState('');
 
   const calculateAge = (birthdate) => {
     const today = new Date();
@@ -81,40 +77,6 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
     setUserType(event.target.value);
   };
 
-  const handleAddTeam = () => {
-    const request = newTeamName;
-
-    AuthService.createTeam(request)
-      .then((response) => {
-        console.log(response);
-        // Update the local teams array with the new team
-        setTeams(prevTeams => [...prevTeams, response]);
-        console.log(teams);
-
-        // Set the currentTeam to the new team's id
-        setCurrentTeam(response.id);
-
-        setSnackbarText("Team created successfully!");
-        setSnackbarType("success");
-        setSnackbarOpen(true);
-        setNewTeamName('');
-        handleCloseTeamDialog();
-      })
-      .catch((err) => {
-        // Since our mock API always succeeds, this code won't run.
-        // But it's here for completeness.
-        setSnackbarText("Failed to create team.");
-        setSnackbarType("error");
-        setSnackbarOpen(true);
-        console.log(err);
-      });
-
-    // Clear the new team name and close the dialog
-    setNewTeamName('');
-    handleCloseTeamDialog();
-    console.log(teams);
-  };
-
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
       return;
@@ -137,15 +99,6 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
   const handleTeamChange = (event) => {
     setCurrentTeam(event.target.value);
   };
-
-  const handleOpenTeamDialog = () => {
-    setIsTeamDialogOpen(true);
-  };
-
-  const handleCloseTeamDialog = () => {
-    setIsTeamDialogOpen(false);
-  };
-
 
   const onSubmit = (e) => {
     e.preventDefault();
@@ -243,40 +196,6 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
                     </MenuItem>
                   ))}
                 </Select>
-                {userType === "manager" && (
-                  <>
-                    <IconButton onClick={handleOpenTeamDialog} size="small">
-                      <AddIcon />
-                    </IconButton>
-                    <Dialog open={isTeamDialogOpen} onClose={handleCloseTeamDialog}>
-                      <DialogTitle>Create a New Team</DialogTitle>
-                      <DialogContent>
-                        <DialogContentText>
-                          Please enter the name for the new team.
-                        </DialogContentText>
-                        <TextField
-                          autoFocus
-                          margin='dense'
-                          id='teamName'
-                          label='Team Name'
-                          value={newTeamName}
-                          onChange={(e) => setNewTeamName(e.target.value)}
-                          fullWidth
-                          variant='standard'
-                          required
-                        />
-                      </DialogContent>
-                      <DialogActions>
-                        <Button onClick={handleCloseTeamDialog} color="primary">
-                          Cancel
-                        </Button>
-                        <Button onClick={handleAddTeam} color="primary">
-                          Add
-                        </Button>
-                      </DialogActions>
-                    </Dialog>
-                  </>
-                )}
               </Box>
             </FormControl>
             {userType === 'player' && (
