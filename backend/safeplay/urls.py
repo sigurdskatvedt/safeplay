@@ -23,7 +23,7 @@ urlpatterns = [
     path('api/', include('apps.teams.urls')),
     path('api/', include('apps.matches.urls')),
     path('api/', include('apps.consent_requests.urls')),
-    path('api/objections/', include('apps.objections.urls')),
+    path('api/', include('apps.objections.urls')),
     path('api/', include('apps.fields.urls')),  # Updated line
 
 ]

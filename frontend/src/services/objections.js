@@ -2,7 +2,7 @@ import api from "./api";
 
 const AddNewObjection = (objectionData) => {
   // Replace 'your-endpoint' with the actual endpoint for adding a new objection
-  const request = api.post('objections/', objectionData, {
+  const request = api.post('objections/create_objection/', objectionData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },

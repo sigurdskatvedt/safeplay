@@ -31,9 +31,8 @@ const Object = () => {
 
     // Create a FormData object to hold the text and file
     const formData = new FormData();
-    formData.append('text', objectionText);
     if (selectedFile) {
-      formData.append('document', selectedFile);
+      formData.append('objection', selectedFile);
     }
 
     // Use the AddNewObjection service to send the data

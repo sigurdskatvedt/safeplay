@@ -4,6 +4,10 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse_lazy
 from django.conf import settings
 
+class ObjectionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Objection
+        fields = ('id', 'document')
 
 class ObjectionPostSerializer(serializers.ModelSerializer):
     """

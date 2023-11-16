@@ -23,7 +23,6 @@ class CreateMatchView(APIView):
         team2_id = request.data.get('team2')
         field_id = request.data.get('field')
         date_time = request.data.get('date_time')
-        print("date_time: ", date_time)
         user_timezone_str = request.data.get('timezone', 'UTC')  # Default to UTC if not provided
 
         # Convert date_time to a datetime object and calculate end_time
@@ -55,7 +54,6 @@ class CreateMatchView(APIView):
             booking=new_booking
         )
 
-        print(new_match.date_time)
         # Serialize the match to return with the response
         match_serializer = MatchSerializer(new_match)
 

@@ -1,12 +1,15 @@
 from django.urls import path
-from . import views
+from .views import ObjectionAPIView, ObjectionViewSet
 from rest_framework.routers import DefaultRouter
 
 
+# Create a router and register our viewsets with it.
 router = DefaultRouter()
+router.register(r'objections', ObjectionViewSet)
 
-router.register('api/objection', views.ObjectionViewSet, basename='objection')
+urlpatterns = router.urls
 
-urlpatterns = [*router.urls]
-
-
+# Add the URL pattern for creating a match
+urlpatterns += [
+    path('create_objection/', ObjectionAPIView.as_view(), name='create-objection'),
+    ]
