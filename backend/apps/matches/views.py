@@ -9,9 +9,8 @@ from rest_framework import status, viewsets
 from .models import Match
 from .serializers import MatchSerializer
 from apps.fields.models import Booking, Field
-from apps.fields.serializers import BookingSerializer
 from apps.teams.models import Team  # Assuming you have a Team model
-from django.utils.timezone import make_aware, utc
+from django.utils.timezone import make_aware, utc, now
 import pytz
 
 class MatchViewSet(viewsets.ModelViewSet):
@@ -32,9 +31,12 @@ class CreateMatchView(APIView):
         start_time_naive = parse_datetime(date_time)
         start_time_user_tz = make_aware(start_time_naive, user_timezone)
 
-        # Convert to UTC
+       # Convert to UTC
         start_time_utc = start_time_user_tz.astimezone(utc)
 
+        # Check if the match time is in the past
+        if start_time_utc < now():
+            return Response({'error': 'Cannot set matches in the past'}, status=status.HTTP_400_BAD_REQUEST)
         # Calculate end_time in UTC
         end_time_utc = start_time_utc + timedelta(hours=1)
 
