@@ -102,7 +102,8 @@ class RegisterSerializer(UserSerializer):
                 guardian = get_user_model().objects.get(username=guardian_username)
                 user.guardian = guardian
             except get_user_model().DoesNotExist:
-                raise serializers.ValidationError({"guardian_username": "A user with this username does not exist."})
+                raise serializers.ValidationError(
+                    {"guardian_username": "A user with this username does not exist."})
 
         user.is_active = False  # set user to inactive until email is verified
         user.save()

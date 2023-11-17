@@ -220,7 +220,6 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
                 />
                 {showGuardianField && (
                   <TextField
-                    required
                     label="Guardian's Username"
                     onInput={(e) => setGuardianUsername(e.target.value)}
                     value={guardianUsername}

@@ -14,13 +14,41 @@ import ConsentRequestsService from "../services/consentRequests";
 const ConsentRequestCard = ({ consentRequest, update, OpenSnackbar }) => {
 
   const handleApprovalChange = (event) => {
-    const newApprovalStatus = event.target.checked;
-    if (newApprovalStatus) {
+    const newApprovalStatus = event.target.checked ? "accepted" : "declined";
+    const userType = consentRequest.user.user_type; // Assuming this is how you get the user type
+    const userBirthday = new Date(consentRequest.user.birthdate); // Assuming birthday is in a suitable format
+    const age = calculateAge(userBirthday); // Implement calculateAge function
+    console.log(consentRequest.request_status)
+    console.log(userType)
+    console.log(age)
+
+    if (userType === "player" && age < 15 && !(consentRequest.request_status === "accepted")) {
+      // Show error or prevent change
+      OpenSnackbar("Only guardians can approve consent requests for players under 15 years old.", "error");
+      return;
+    }
+
+    if (newApprovalStatus === "accepted") {
       approveConsentRequest(consentRequest.id);
     } else {
       removeApproval(consentRequest.id);
     }
   };
+
+  function calculateAge(birthday) {
+    const today = new Date();
+    const birthDate = new Date(birthday);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDifference = today.getMonth() - birthDate.getMonth();
+
+    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+
+    return age;
+  }
+
+
 
 
   const approveConsentRequest = (id) => {
@@ -92,11 +120,19 @@ const ConsentRequestCard = ({ consentRequest, update, OpenSnackbar }) => {
         </Typography>
 
         <Stack direction="row" alignItems="center" spacing={1}>
-          <Typography variant='body2' color={consentRequest.request_status === "accepted" ? 'success.main' : 'error.main'} sx={{ mt: 1 }}>
-            {consentRequest.request_status === "accepted" ? 'Accepted' : 'Not Approved'}
+          <Typography
+            variant='body2'
+            color={
+              consentRequest.request_status === "accepted" ? 'success.main' :
+                consentRequest.request_status === "pending" ? 'warning.main' :
+                  'error.main'
+            }
+            sx={{ mt: 1 }}
+          >
+            {consentRequest.request_status.charAt(0).toUpperCase() + consentRequest.request_status.slice(1)}
           </Typography>
           <Switch
-            checked={consentRequest.is_approved}
+            checked={consentRequest.request_status === "accepted"}
             onChange={handleApprovalChange}
             inputProps={{ 'aria-label': 'controlled' }}
           />

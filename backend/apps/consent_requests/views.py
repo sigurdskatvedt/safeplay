@@ -17,7 +17,6 @@ class ConsentRequestViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         user = self.request.user
         if user.user_type == 'guardian':
-            print("hello")
             return ConsentRequest.objects.filter(user__guardian=user, match__date_time__gte=timezone.now(), request_status="pending")
         else:
             return ConsentRequest.objects.filter(user=user, match__date_time__gte=timezone.now(), request_status="pending")
@@ -70,7 +69,7 @@ class UserConsentRequestViewSet(viewsets.ReadOnlyModelViewSet):
     def get_past_requests(self):
         user = self.request.user
         if user.user_type == 'guardian':
-             # Filter past requests where the current user is the guardian of the associated user
+            # Filter past requests where the current user is the guardian of the associated user
             return ConsentRequest.objects.filter(user__guardian=user, match__date_time__lt=timezone.now())
         else:
             # If not a guardian, return the user's own past requests
@@ -94,23 +93,27 @@ def approve_request(request, request_id):
     except ConsentRequest.DoesNotExist:
         return Response({"error": "Request not found or you are not the guardian of the player."}, status=404)
 
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def remove_approval(request, request_id):
     user = request.user
-    if user.user_type != 'guardian':
-        return Response({"error": "Only guardians can remove approvals.", "error_code": "not_guardian"}, status=403)
 
     try:
         # Check if the consent request is for a player under the guardianship of the current user
-        consent_request = ConsentRequest.objects.get(
-            id=request_id, user__guardian=user)
+        if (user.user_type == "guardian"):
+            consent_request = ConsentRequest.objects.get(
+                id=request_id, user__guardian=user)
+        else:
+            consent_request = ConsentRequest.objects.get(
+                id=request_id, user=user)
+
+
         consent_request.request_status = "declined"
         consent_request.save()
         return Response({"message": "Approval removed successfully."}, status=200)
     except ConsentRequest.DoesNotExist:
         return Response({"error": "Request not found or you are not the guardian of the player."}, status=404)
-
 
 
 @api_view(['GET'])

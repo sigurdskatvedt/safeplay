@@ -30,16 +30,16 @@ const ConsentRequests = ({ user }) => {
   };
 
   const Update = () => {
-    ConsentRequestsService.fetchPendingRequests() // Assuming you have this method in the service
+    ConsentRequestsService.fetchPendingRequests()
       .then((response) => {
         setRequests(response);
       })
       .catch((error) => {
         console.log(error);
       });
-    ConsentRequestsService.fetchPastRequests() // Fetch past requests
+    ConsentRequestsService.fetchPastRequests()
       .then((response) => {
-        setPastRequests(response); // Update the state variable for past requests
+        setPastRequests(response);
       })
       .catch((error) => {
         console.log(error);
