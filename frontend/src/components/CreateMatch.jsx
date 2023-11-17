@@ -57,14 +57,13 @@ const CreateMatch = () => {
 
   useEffect(() => {
     if (formData.field && formData.date) {
-      FieldsService.FetchAvailableTimeSlots(formData.field, formData.date, formData.timezone)
+      FieldsService.FetchAvailableTimeSlots(formData.field, formData.date, "GMT")
         .then((response) => {
           const parsedResponse = response.map((timeSlot) => ({
             ...timeSlot,
             start_time: dayjs(timeSlot.start_time),
             end_time: dayjs(timeSlot.end_time),
           }));
-          console.log(response);
           setUnavailableTimeSlots(parsedResponse);
         })
         .catch((error) => {
@@ -89,6 +88,7 @@ const CreateMatch = () => {
       team2: formData.team2,
       field: formData.field,
       date_time: dateTime,
+      timezone: formData.timezone,
     };
 
     MatchesService.AddMatch(dataToSubmit)

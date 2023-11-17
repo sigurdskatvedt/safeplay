@@ -11,6 +11,8 @@ from .serializers import MatchSerializer
 from apps.fields.models import Booking, Field
 from apps.fields.serializers import BookingSerializer
 from apps.teams.models import Team  # Assuming you have a Team model
+from django.utils.timezone import make_aware, utc
+import pytz
 
 class MatchViewSet(viewsets.ModelViewSet):
     queryset = Match.objects.all().prefetch_related('consent_requests')
@@ -25,21 +27,33 @@ class CreateMatchView(APIView):
         date_time = request.data.get('date_time')
         user_timezone_str = request.data.get('timezone', 'UTC')  # Default to UTC if not provided
 
-        # Convert date_time to a datetime object and calculate end_time
-        start_time = parse_datetime(date_time)
-        end_time = start_time + timedelta(hours=1)
+            # Convert date_time to a datetime object in the user's timezone
+        user_timezone = pytz.timezone(user_timezone_str)
+        start_time_naive = parse_datetime(date_time)
+        start_time_user_tz = make_aware(start_time_naive, user_timezone)
+
+        # Convert to UTC
+        start_time_utc = start_time_user_tz.astimezone(utc)
+
+        # Calculate end_time in UTC
+        end_time_utc = start_time_utc + timedelta(hours=1)
+
 
         # Check if the field is available
         field = get_object_or_404(Field, pk=field_id)
-        bookings = Booking.objects.filter(field=field, start_time__lt=end_time, end_time__gt=start_time)
+        bookings = Booking.objects.filter(
+            field=field,
+            start_time__lt=end_time_utc,
+            end_time__gt=start_time_utc
+        )
         if bookings.exists():
             return Response({'error': 'Field is not available during the requested time period'}, status=status.HTTP_400_BAD_REQUEST)
 
         # If the field is available, create the booking
         new_booking = Booking.objects.create(
             field=field,
-            start_time=start_time,
-            end_time=end_time
+            start_time=start_time_utc,
+            end_time=end_time_utc
         )
 
         # Now create the match
@@ -49,7 +63,7 @@ class CreateMatchView(APIView):
         new_match = Match.objects.create(
             team1=team1,
             team2=team2,
-            date_time=start_time,
+            date_time=start_time_utc,
             # Assuming you add a booking field to the Match model
             booking=new_booking
         )

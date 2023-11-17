@@ -1,6 +1,6 @@
 # apps/fields/views.py
 import pytz
-from datetime import datetime, date, time
+from datetime import timedelta
 from dateutil.parser import isoparse
 from rest_framework.response import Response
 from rest_framework import status, generics
@@ -56,16 +56,14 @@ class FieldBookingsView(APIView):
         if user_timezone_str is None:
             return Response({'error': 'Timezone is required'}, status=status.HTTP_400_BAD_REQUEST)
 
-        print("datestring:" + date_str)
         date_obj = isoparse(date_str)
 
         # Convert UTC date to user's timezone
         user_timezone = pytz.timezone(user_timezone_str)
         local_date_obj = date_obj.astimezone(user_timezone)
 
-        start_time = datetime.combine(local_date_obj, time.min)
-        end_time = datetime.combine(local_date_obj, time.max)
-        print("start_time:", start_time)
+        start_time = local_date_obj
+        end_time = start_time + timedelta(days=1)
         print("end_time:", end_time)
 
         bookings = Booking.objects.filter(
