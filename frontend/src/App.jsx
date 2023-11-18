@@ -82,13 +82,11 @@ const App = () => {
                 </Grid>
               </>
             ) : null}
-            {user?.id ? (
-              <Grid item marginTop={0.8}>
-                <Button color='inherit' component={Link} to='/object'>
-                  Object
-                </Button>
-              </Grid>
-            ) : null}
+            <Grid item marginTop={0.8}>
+              <Button color='inherit' component={Link} to='/object'>
+                Object
+              </Button>
+            </Grid>
             {user?.user_type === 'guardian' || user?.user_type === 'player' ? (  // Updated condition
               <Grid item marginTop={0.8}>
                 <Button color='inherit' component={Link} to='/consent-requests'>

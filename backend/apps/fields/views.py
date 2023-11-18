@@ -3,7 +3,9 @@ import pytz
 from datetime import timedelta
 from dateutil.parser import isoparse
 from rest_framework.response import Response
+from rest_framework.exceptions import PermissionDenied
 from rest_framework import status, generics
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from .serializers import BookingSerializer, FieldSerializer
@@ -12,7 +14,14 @@ from django.utils.dateparse import parse_datetime
 from django.utils import timezone  # Correct import for timezone
 
 
+class FieldListView(generics.ListAPIView):
+    queryset = Field.objects.all()
+    serializer_class = FieldSerializer
+
+
 class BookingsView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
         bookings = Booking.objects.all()
         serializer = BookingSerializer(bookings, many=True)
@@ -20,7 +29,15 @@ class BookingsView(APIView):
 
 
 class BookFieldView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def post(self, request, field_id):
+        user = request.user
+
+        # Check if the user is a manager
+        if user.user_type != 'manager':
+            raise PermissionDenied("Only managers can book fields")
+
         field = get_object_or_404(Field, pk=field_id)
         start_time = parse_datetime(request.data.get('start_time'))
         end_time = parse_datetime(request.data.get('end_time'))
@@ -40,12 +57,9 @@ class BookFieldView(APIView):
         return Response({'message': 'Field booked successfully', 'booking_id': new_booking.id})
 
 
-class FieldListView(generics.ListAPIView):
-    queryset = Field.objects.all()
-    serializer_class = FieldSerializer
-
-
 class FieldBookingsView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, field_id):
         field = get_object_or_404(Field, pk=field_id)
         date_str = request.query_params.get('date')
@@ -76,6 +90,7 @@ class CurrentFieldsView(APIView):
     """
     API endpoint that returns all fields that are currently in use.
     """
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         # Get the current time

@@ -2,6 +2,8 @@
 
 from django.shortcuts import get_object_or_404
 from django.utils.dateparse import parse_datetime
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import PermissionDenied
 from datetime import timedelta
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -13,20 +15,30 @@ from apps.teams.models import Team  # Assuming you have a Team model
 from django.utils.timezone import make_aware, utc, now
 import pytz
 
+
 class MatchViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+
     queryset = Match.objects.all().prefetch_related('consent_requests')
     serializer_class = MatchSerializer
 
+
 class CreateMatchView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def post(self, request):
+        if request.user.user_type != 'manager':
+            raise PermissionDenied("Only managers can create matches")
+
         # Extract the necessary data from the request
         team1_id = request.data.get('team1')
         team2_id = request.data.get('team2')
         field_id = request.data.get('field')
         date_time = request.data.get('date_time')
-        user_timezone_str = request.data.get('timezone', 'UTC')  # Default to UTC if not provided
+        user_timezone_str = request.data.get(
+            'timezone', 'UTC')  # Default to UTC if not provided
 
-            # Convert date_time to a datetime object in the user's timezone
+        # Convert date_time to a datetime object in the user's timezone
         user_timezone = pytz.timezone(user_timezone_str)
         start_time_naive = parse_datetime(date_time)
         start_time_user_tz = make_aware(start_time_naive, user_timezone)
@@ -39,7 +51,6 @@ class CreateMatchView(APIView):
             return Response({'error': 'Cannot set matches in the past'}, status=status.HTTP_400_BAD_REQUEST)
         # Calculate end_time in UTC
         end_time_utc = start_time_utc + timedelta(hours=1)
-
 
         # Check if the field is available
         field = get_object_or_404(Field, pk=field_id)
@@ -79,4 +90,3 @@ class CreateMatchView(APIView):
             'booking_id': new_booking.id,  # Assuming you want to return the booking ID
             'match': match_serializer.data
         }, status=status.HTTP_201_CREATED)
-
