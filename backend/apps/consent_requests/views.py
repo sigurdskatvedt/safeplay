@@ -46,13 +46,8 @@ def approve_request(request, request_id):
         return Response({"error": "Only guardians or players over 15 years old can approve requests.", "error_code": "not_authorized"}, status=403)
 
     try:
-        # Check if the consent request is for a player under the guardianship of the current user or if the user is the player themselves
-        if user.user_type == 'guardian':
-            consent_request = ConsentRequest.objects.get(
-                id=request_id)
-        elif user.user_type == 'player':
-            consent_request = ConsentRequest.objects.get(
-                id=request_id)
+        consent_request = ConsentRequest.objects.raw(
+            "SELECT * FROM consent_requests_consentrequest WHERE id = %s", [request_id])[0]
 
         consent_request.request_status = "accepted"
         consent_request.save()
@@ -67,13 +62,8 @@ def remove_approval(request, request_id):
     user = request.user
 
     try:
-        # Check if the consent request is for a player under the guardianship of the current user
-        if (user.user_type == "guardian"):
-            consent_request = ConsentRequest.objects.get(
-                id=request_id)
-        else:
-            consent_request = ConsentRequest.objects.get(
-                id=request_id)
+        consent_request = ConsentRequest.objects.raw(
+            "SELECT * FROM consent_requests_consentrequest WHERE id = %s", [request_id])[0]
 
         consent_request.request_status = "declined"
         consent_request.save()
