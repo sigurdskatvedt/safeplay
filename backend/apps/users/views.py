@@ -117,6 +117,7 @@ class VerificationView(generics.GenericAPIView):
         return redirect(invalid_url)
 
 
+
 class PasswordResetEmailView(generics.GenericAPIView):
     """View for sending password reset email"""
     serializer_class = ResetPasswordSerializer
