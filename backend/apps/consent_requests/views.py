@@ -49,10 +49,10 @@ def approve_request(request, request_id):
         # Check if the consent request is for a player under the guardianship of the current user or if the user is the player themselves
         if user.user_type == 'guardian':
             consent_request = ConsentRequest.objects.get(
-                id=request_id, user__guardian=user)
+                id=request_id)
         elif user.user_type == 'player':
             consent_request = ConsentRequest.objects.get(
-                id=request_id, user=user)
+                id=request_id)
 
         consent_request.request_status = "accepted"
         consent_request.save()
@@ -70,10 +70,10 @@ def remove_approval(request, request_id):
         # Check if the consent request is for a player under the guardianship of the current user
         if (user.user_type == "guardian"):
             consent_request = ConsentRequest.objects.get(
-                id=request_id, user__guardian=user)
+                id=request_id)
         else:
             consent_request = ConsentRequest.objects.get(
-                id=request_id, user=user)
+                id=request_id)
 
         consent_request.request_status = "declined"
         consent_request.save()
