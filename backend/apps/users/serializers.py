@@ -16,7 +16,14 @@ from rest_framework.exceptions import AuthenticationFailed
 from django.utils.encoding import force_bytes, force_str
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 
-# TODO: Dont include all fields
+"""Serializer for users"""
+
+
+class Meta:
+    model = get_user_model()
+    fields = ['id', 'username', 'email',
+              'team_id', 'first_name', 'last_name', 'user_type', 'guardian']
+    read_only_fields = ['id']
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -24,8 +31,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = get_user_model()
-        fields = ['id', 'username', 'email',
-                  'team_id', 'first_name', 'last_name', 'user_type', 'guardian']
+        fields = ['id', 'username', 'email', 'is_volunteer', 'is_staff']
         read_only_fields = ['id']
 
 
@@ -33,43 +39,22 @@ class LoginSerializer(TokenObtainPairSerializer):
     """Serializer for login"""
 
     def validate(self, attrs):
-        username = attrs["username"]
-        user = None
-        if get_user_model().objects.filter(username=username):
-            user = get_user_model().objects.get(username=username)
+        data = super().validate(attrs)
 
-            if user.login_timeout.replace(tzinfo=None) > datetime.datetime.now():
-                raise serializers.ValidationError(
-                    "User is timed out for too many incorrect authentication attempts"
-                )
+        # use get_token() from TokenObtainPairSerializer to get refresh token and access token
+        refresh = self.get_token(self.user)
 
-        try:
-            data = super().validate(attrs)
+        # add user data to response
+        data['user'] = UserSerializer(self.user).data
+        # add refresh token to response
+        data['refresh'] = str(refresh)
+        # add access token to response
+        data['access'] = str(refresh.access_token)
 
-            refresh = self.get_token(self.user)
+        if api_settings.UPDATE_LAST_LOGIN:
+            update_last_login(None, self.user)
 
-            data["user"] = UserSerializer(self.user).data
-            data["refresh"] = str(refresh)
-            data["access"] = str(refresh.access_token)
-            if api_settings.UPDATE_LAST_LOGIN:
-                update_last_login(None, self.user)
-
-            user.login_attempts = 0
-            user.save()
-
-            return data
-        except:
-            if user:
-                user.login_attempts += 1
-
-                if user.login_attempts > 4:
-                    user.login_timeout = datetime.datetime.now() + datetime.timedelta(
-                        minutes=10
-                    )
-
-                user.save()
-                print(user.login_attempts)
-            return {}
+        return data  # return response
 
 
 class RegisterSerializer(UserSerializer):
