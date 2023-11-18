@@ -9,7 +9,7 @@ from django.core import exceptions
 from django.core.mail import EmailMessage
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib.sites.shortcuts import get_current_site
-from django.urls import reverse_lazy
+from django.urls import reverse
 from django.conf import settings
 from .models import User, Team
 from rest_framework.exceptions import AuthenticationFailed
@@ -31,7 +31,8 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = get_user_model()
-        fields = ['id', 'username', 'email', 'is_volunteer', 'is_staff']
+        fields = ['id', 'username', 'email',
+              'team_id', 'first_name', 'last_name', 'user_type', 'guardian']
         read_only_fields = ['id']
 
 
@@ -56,16 +57,26 @@ class LoginSerializer(TokenObtainPairSerializer):
 
         return data  # return response
 
+
 class RegisterSerializer(UserSerializer):
     """Serializer for user registration"""
     password = serializers.CharField(
         max_length=128, min_length=1, write_only=True, required=True)
     email = serializers.CharField(
         max_length=128, min_length=1,  required=True)
+    team_id = serializers.IntegerField(write_only=True, required=False)
+    birthdate = serializers.DateField(required=False)
+    first_name = serializers.CharField(max_length=30, required=True)
+    last_name = serializers.CharField(max_length=30, required=True)
+    user_type = serializers.ChoiceField(
+        choices=User.USER_TYPES, required=True)  # Add user_type field
+    guardian_username = serializers.CharField(
+        max_length=150, write_only=True, required=False)
 
     class Meta:
         model = get_user_model()
-        fields = ['id', 'username', 'email', 'password', 'is_volunteer']
+        fields = ['id', 'username', 'email', 'password', 'user_type',
+                  'team_id', 'birthdate', 'first_name', 'last_name', 'guardian_username']
 
     def create(self, validated_data):
         user = get_user_model().objects.create_user(**validated_data)
@@ -78,21 +89,16 @@ class RegisterSerializer(UserSerializer):
         email_subject = "Activate your account"
         uid = urlsafe_base64_encode(user.username.encode())
         domain = get_current_site(self.context["request"])
-        token = PasswordResetTokenGenerator().make_token(user)
-        # Added token to link variable
-        link = reverse_lazy('verify-email', kwargs={"uid": uid, "token": token})
-        # Safe user specific token now in link name
+        link = reverse('verify-email', kwargs={"uid": uid})
         url = f"{settings.PROTOCOL}://{domain}{link}"
-
         mail = EmailMessage(
             email_subject,
             url,
             None,
             [email],
         )
-        mail.send(fail_silently=False)  # send email to user
 
-        return user
+        mail.send(fail_silently=False)
 
     def validate(self, data):
 
@@ -183,5 +189,7 @@ class SetNewPasswordSerializer(serializers.Serializer):
 
         user.set_password(password)  # set new password
         user.save()
+
+        return user
 
         return user
