@@ -13,11 +13,6 @@ import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import Box from "@mui/material/Box";
@@ -34,8 +29,6 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
   const [email, setEmail] = useState("");
   const [guardianUsername, setGuardianUsername] = useState("");
   const [showGuardianField, setShowGuardianField] = useState(false);
-  const [emailUsername, setEmailUsername] = useState("");
-  const [sendEmail, setSendEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState(""); // New state variable for confirm password
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -43,7 +36,6 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
   const [snackbarType, setSnackbarType] = useState("success");
   const [birthdate, setBirthdate] = React.useState(new Date().toISOString().split('T')[0]);
   const [userType, setUserType] = React.useState("player");
-  const [open, setOpen] = useState(false);
   const [currentTeam, setCurrentTeam] = useState("");
   const [teams, setTeams] = useState([]);
 
@@ -83,14 +75,6 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
       return;
     }
     setSnackbarOpen(false);
-  };
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleResetClose = () => {
-    setOpen(false);
   };
 
   const handleChangeAccountBirth = (event) => {
@@ -145,26 +129,6 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
         setSnackbarText(msg);
         setSnackbarType("error");
         setSnackbarOpen(true);
-      });
-  };
-
-  const sendNewLink = (e) => {
-    e.preventDefault();
-
-    const request = { username: emailUsername, email: sendEmail };
-
-    AuthService.sendNewEmail(request)
-      .then((response) => {
-        setOpen(false);
-
-        console.log("New link is sent");
-        setEmailUsername("");
-        setSendEmail("");
-        setAppSnackbarText("If the user exist, a link has been sent.");
-        setAppSnackbarOpen(true);
-      })
-      .catch((err) => {
-        console.log("New link request failed");
       });
   };
 
@@ -277,13 +241,6 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
             >
               Already registered? Click here to sign in!
             </Link>
-            <Link
-              component='button'
-              underline='hover'
-              onClick={handleClickOpen}
-            >
-              Need New Activation-link?
-            </Link>
           </Stack>
         </form>
         <Snackbar
@@ -296,45 +253,6 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
             {snackbarText}
           </Alert>
         </Snackbar>
-
-        <Dialog open={open} onClose={handleResetClose}>
-          <form onSubmit={sendNewLink}>
-            <DialogTitle>Need New Activation-link?</DialogTitle>
-            <DialogContent>
-              <DialogContentText>
-                To receive a new activation-link, please enter your email and
-                username.
-              </DialogContentText>
-              <TextField
-                autoFocus
-                margin='dense'
-                id='name'
-                label='Email Address'
-                type='email'
-                onInput={(e) => setSendEmail(e.target.value)}
-                value={sendEmail}
-                fullWidth
-                variant='standard'
-                required
-              />
-              <TextField
-                autoFocus
-                required
-                margin='dense'
-                id='name'
-                onInput={(e) => setEmailUsername(e.target.value)}
-                value={emailUsername}
-                label='Username'
-                fullWidth
-                variant='standard'
-              />
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleResetClose}>Cancel</Button>
-              <Button type='submit'>Submit</Button>
-            </DialogActions>
-          </form>
-        </Dialog>
       </Container>
     </>
   );

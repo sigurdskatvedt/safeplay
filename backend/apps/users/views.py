@@ -103,6 +103,7 @@ class VerificationView(generics.GenericAPIView):
             user = get_user_model().objects.filter(username=username).first()
             user.is_active = True  # Activate user
             user.save()
+
             return redirect(verified_url)
 
         except Exception as ex:
@@ -140,39 +141,6 @@ class PasswordResetEmailView(generics.GenericAPIView):
                 )
                 mail.send(fail_silently=False)
         return Response({'success': "If the user exists, you will shortly receive a link to reset your password."}, status=status.HTTP_200_OK)
-
-
-class ActivationLinkEmailView(generics.GenericAPIView):
-    serializer_class = SendNewEmailSerializer
-
-    def post(self, request):
-        if request.data.get("email") and request.data.get("username"):
-            email = request.data["email"]
-            username = request.data["username"]
-
-            user = get_user_model().objects.get(email=email, username=username)
-            user.verify_email_timer = datetime.now(timezone.utc)
-            user.save()
-
-            if user.is_active != True:
-
-                email_subject = "Activate your account"
-                uid = urlsafe_base64_encode(user.username.encode())
-                domain = get_current_site(request).domain
-                token = PasswordResetTokenGenerator().make_token(user)
-                link = reverse(
-                    'verify-email', kwargs={"uid": uid, "token": token})
-
-                url = f"{settings.PROTOCOL}://{domain}{link}"
-
-                mail = EmailMessage(
-                    email_subject,
-                    url,
-                    None,
-                    [email],
-                )
-                mail.send(fail_silently=False)
-        return Response({'success': "If the user is not activated, you will shortly receive a link to reset your password."}, status=status.HTTP_200_OK)
 
 
 class ResetPasswordView(generics.GenericAPIView):
