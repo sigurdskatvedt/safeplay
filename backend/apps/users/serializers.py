@@ -78,46 +78,26 @@ class RegisterSerializer(UserSerializer):
                   'team_id', 'birthdate', 'first_name', 'last_name', 'guardian_username']
 
     def create(self, validated_data):
-        team_id = validated_data.pop('team_id', None)
-        guardian_username = validated_data.pop('guardian_username', None)
         user = get_user_model().objects.create_user(**validated_data)
-
-        if guardian_username:
-            try:
-                guardian = get_user_model().objects.get(username=guardian_username)
-                user.guardian = guardian
-            except get_user_model().DoesNotExist:
-                raise serializers.ValidationError(
-                    {"guardian_username": "A user with this username does not exist."})
 
         user.is_active = False  # set user to inactive until email is verified
         user.save()
-
-        if team_id:
-            team = Team.objects.get(id=team_id)
-            user.team = team
-            user.save()
 
         # create email to send to user
         email = validated_data["email"]
         email_subject = "Activate your account"
         uid = urlsafe_base64_encode(user.username.encode())
         domain = get_current_site(self.context["request"])
-        token = PasswordResetTokenGenerator().make_token(user)
-        # Added token to link variable
-        link = reverse('verify-email', kwargs={"uid": uid, "token": token})
-        # Safe user specific token now in link name
+        link = reverse('verify-email', kwargs={"uid": uid})
         url = f"{settings.PROTOCOL}://{domain}{link}"
-
         mail = EmailMessage(
             email_subject,
             url,
             None,
             [email],
         )
-        mail.send(fail_silently=False)  # send email to user
 
-        return user
+        mail.send(fail_silently=False)
 
     def validate(self, data):
 
@@ -208,5 +188,7 @@ class SetNewPasswordSerializer(serializers.Serializer):
 
         user.set_password(password)  # set new password
         user.save()
+
+        return user
 
         return user
