@@ -50,11 +50,7 @@ const newPassword = (data) => {
 };
 
 const logout = () => {
-  return api
-    .post("/logout/", { refresh: TokenService.getLocalRefreshToken() })
-    .then(() => {
-      TokenService.removeUser();
-    });
+  TokenService.removeUser();
 };
 
 const getCurrentUser = () => {
