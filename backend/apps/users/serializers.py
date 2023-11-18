@@ -9,14 +9,21 @@ from django.core import exceptions
 from django.core.mail import EmailMessage
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib.sites.shortcuts import get_current_site
-from django.urls import reverse
+from django.urls import reverse_lazy
 from django.conf import settings
 from .models import User, Team
 from rest_framework.exceptions import AuthenticationFailed
 from django.utils.encoding import force_bytes, force_str
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 
-# TODO: Dont include all fields
+"""Serializer for users"""
+
+
+class Meta:
+    model = get_user_model()
+    fields = ['id', 'username', 'email',
+              'team_id', 'first_name', 'last_name', 'user_type', 'guardian']
+    read_only_fields = ['id']
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -24,8 +31,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = get_user_model()
-        fields = ['id', 'username', 'email',
-                  'team_id', 'first_name', 'last_name', 'user_type', 'guardian']
+        fields = ['id', 'username', 'email', 'is_volunteer', 'is_staff']
         read_only_fields = ['id']
 
 
@@ -33,44 +39,22 @@ class LoginSerializer(TokenObtainPairSerializer):
     """Serializer for login"""
 
     def validate(self, attrs):
-        username = attrs["username"]
-        user = None
-        if get_user_model().objects.filter(username=username):
-            user = get_user_model().objects.get(username=username)
+        data = super().validate(attrs)
 
-            if user.login_timeout.replace(tzinfo=None) > datetime.datetime.now():
-                raise serializers.ValidationError(
-                    "User is timed out for too many incorrect authentication attempts"
-                )
+        # use get_token() from TokenObtainPairSerializer to get refresh token and access token
+        refresh = self.get_token(self.user)
 
-        try:
-            data = super().validate(attrs)
+        # add user data to response
+        data['user'] = UserSerializer(self.user).data
+        # add refresh token to response
+        data['refresh'] = str(refresh)
+        # add access token to response
+        data['access'] = str(refresh.access_token)
 
-            refresh = self.get_token(self.user)
+        if api_settings.UPDATE_LAST_LOGIN:
+            update_last_login(None, self.user)
 
-            data["user"] = UserSerializer(self.user).data
-            data["refresh"] = str(refresh)
-            data["access"] = str(refresh.access_token)
-            if api_settings.UPDATE_LAST_LOGIN:
-                update_last_login(None, self.user)
-
-            user.login_attempts = 0
-            user.save()
-
-            return data
-        except:
-            if user:
-                user.login_attempts += 1
-
-                if user.login_attempts > 4:
-                    user.login_timeout = datetime.datetime.now() + datetime.timedelta(
-                        minutes=10
-                    )
-
-                user.save()
-                print(user.login_attempts)
-            return {}
-
+        return data  # return response
 
 class RegisterSerializer(UserSerializer):
     """Serializer for user registration"""
@@ -78,40 +62,16 @@ class RegisterSerializer(UserSerializer):
         max_length=128, min_length=1, write_only=True, required=True)
     email = serializers.CharField(
         max_length=128, min_length=1,  required=True)
-    team_id = serializers.IntegerField(write_only=True, required=False)
-    birthdate = serializers.DateField(required=False)
-    first_name = serializers.CharField(max_length=30, required=True)
-    last_name = serializers.CharField(max_length=30, required=True)
-    user_type = serializers.ChoiceField(
-        choices=User.USER_TYPES, required=True)  # Add user_type field
-    guardian_username = serializers.CharField(
-        max_length=150, write_only=True, required=False)
 
     class Meta:
         model = get_user_model()
-        fields = ['id', 'username', 'email', 'password', 'user_type',
-                  'team_id', 'birthdate', 'first_name', 'last_name', 'guardian_username']
+        fields = ['id', 'username', 'email', 'password', 'is_volunteer']
 
     def create(self, validated_data):
-        team_id = validated_data.pop('team_id', None)
-        guardian_username = validated_data.pop('guardian_username', None)
         user = get_user_model().objects.create_user(**validated_data)
-
-        if guardian_username:
-            try:
-                guardian = get_user_model().objects.get(username=guardian_username)
-                user.guardian = guardian
-            except get_user_model().DoesNotExist:
-                raise serializers.ValidationError(
-                    {"guardian_username": "A user with this username does not exist."})
 
         user.is_active = False  # set user to inactive until email is verified
         user.save()
-
-        if team_id:
-            team = Team.objects.get(id=team_id)
-            user.team = team
-            user.save()
 
         # create email to send to user
         email = validated_data["email"]
@@ -120,7 +80,7 @@ class RegisterSerializer(UserSerializer):
         domain = get_current_site(self.context["request"])
         token = PasswordResetTokenGenerator().make_token(user)
         # Added token to link variable
-        link = reverse('verify-email', kwargs={"uid": uid, "token": token})
+        link = reverse_lazy('verify-email', kwargs={"uid": uid, "token": token})
         # Safe user specific token now in link name
         url = f"{settings.PROTOCOL}://{domain}{link}"
 
