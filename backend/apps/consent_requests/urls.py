@@ -1,6 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import UserConsentRequestViewSet, approve_request, remove_approval, past_consent_requests
+from .views import UserConsentRequestViewSet
+from apps.consent_requests import views
 
 router = DefaultRouter()
 router.register(r'user-requests', UserConsentRequestViewSet,
@@ -9,8 +10,10 @@ router.register(r'user-requests', UserConsentRequestViewSet,
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('approve/<int:request_id>/', approve_request, name='approve_request'),
-    path('remove-approval/<int:request_id>/',
-         remove_approval, name='remove_approval'),
-    path('past_requests/', past_consent_requests, name='past-requests'),
+    path('approve/', views.ApproveRequestView.as_view(),
+         name='approve_request'),
+    path('remove-approval/', views.RemoveApprovalView.as_view(),
+         name='remove_approval'),
+    path('past-requests/', views.PastConsentRequestsView.as_view(),
+         name='past_requests'),
 ]

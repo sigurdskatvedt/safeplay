@@ -1,8 +1,6 @@
 import {
   Card,
-  CardActions,
   CardContent,
-  Button,
   Typography,
   Divider,
   Switch,
@@ -18,9 +16,6 @@ const ConsentRequestCard = ({ consentRequest, update, OpenSnackbar }) => {
     const userType = consentRequest.user.user_type; // Assuming this is how you get the user type
     const userBirthday = new Date(consentRequest.user.birthdate); // Assuming birthday is in a suitable format
     const age = calculateAge(userBirthday); // Implement calculateAge function
-    console.log(consentRequest.request_status)
-    console.log(userType)
-    console.log(age)
 
     if (userType === "player" && age < 15 && !(consentRequest.request_status === "accepted")) {
       // Show error or prevent change
@@ -29,9 +24,9 @@ const ConsentRequestCard = ({ consentRequest, update, OpenSnackbar }) => {
     }
 
     if (newApprovalStatus === "accepted") {
-      approveConsentRequest(consentRequest.id);
+      approveConsentRequest(consentRequest.request_id);
     } else {
-      removeApproval(consentRequest.id);
+      removeApproval(consentRequest.request_id);
     }
   };
 
@@ -51,11 +46,12 @@ const ConsentRequestCard = ({ consentRequest, update, OpenSnackbar }) => {
 
 
 
-  const approveConsentRequest = (id) => {
-    ConsentRequestsService.approveRequest(id)
+  const approveConsentRequest = (request_id) => {
+    ConsentRequestsService.approveRequest({
+      request_id: request_id,
+    })
       .then((response) => {
         update();
-        console.log(consentRequest);
         OpenSnackbar("Consent request approved", "success");
       })
       .catch((error) => {
@@ -72,8 +68,10 @@ const ConsentRequestCard = ({ consentRequest, update, OpenSnackbar }) => {
       });
   };
 
-  const removeApproval = (id) => {
-    ConsentRequestsService.removeApproval(id)
+  const removeApproval = (request_id) => {
+    ConsentRequestsService.removeApproval({
+      request_id: request_id,
+    })
       .then((response) => {
         update();
         OpenSnackbar("Approval removed", "success");
@@ -115,9 +113,7 @@ const ConsentRequestCard = ({ consentRequest, update, OpenSnackbar }) => {
 
         <Divider sx={{ my: 1 }} />
 
-        <Typography variant='body2' color="text.secondary" gutterBottom>
-              
-
+        <Typography component="div" variant='body2' color="text.secondary" gutterBottom>
           <div dangerouslySetInnerHTML={{ __html: `Player: ${consentRequest.user.first_name} ${consentRequest.user.last_name}` }}></div>
         </Typography>
 

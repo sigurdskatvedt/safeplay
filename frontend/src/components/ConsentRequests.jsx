@@ -37,6 +37,7 @@ const ConsentRequests = ({ user }) => {
       .catch((error) => {
         console.log(error);
       });
+
     ConsentRequestsService.fetchPastRequests()
       .then((response) => {
         setPastRequests(response);
@@ -68,7 +69,7 @@ const ConsentRequests = ({ user }) => {
 
           <Grid container padding={2} spacing={5} justifyContent='center'>
             {requests.map((r) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} xl={3} key={r.id}>
+              <Grid item xs={12} sm={6} md={4} lg={3} xl={3} key={`pending_${r.id}`}>
                 <Request
                   user={user}
                   consentRequest={r}
@@ -85,7 +86,7 @@ const ConsentRequests = ({ user }) => {
 
           <Grid container padding={2} spacing={5} justifyContent='center'>
             {pastRequests.map((r) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} xl={3} key={r.id}>
+              <Grid item xs={12} sm={6} md={4} lg={3} xl={3} key={`past_${r.id}`}>
                 <Request
                   user={user}
                   consentRequest={r}
