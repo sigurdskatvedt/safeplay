@@ -17,7 +17,7 @@ const ConsentRequestCard = ({ consentRequest, update, OpenSnackbar }) => {
     const userBirthday = new Date(consentRequest.user.birthdate); // Assuming birthday is in a suitable format
     const age = calculateAge(userBirthday); // Implement calculateAge function
 
-    if (userType === "player" && age < 15 && !(consentRequest.request_status === "accepted")) {
+    if (((userType === "player" && age > 15) || userType === "guardian") && !(consentRequest.request_status === "accepted")) {
       // Show error or prevent change
       OpenSnackbar("Only guardians can approve consent requests for players under 15 years old.", "error");
       return;
