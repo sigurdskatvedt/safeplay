@@ -1,4 +1,4 @@
-import { Box, Stack, Typography, Snackbar, TextField, Button } from "@mui/material";
+import { Stack, Typography, Snackbar, TextField, Button } from "@mui/material";
 import React, { useState } from "react";
 import MuiAlert from "@mui/material/Alert";
 import ObjectionsService from '../services/objections';
@@ -9,15 +9,18 @@ const Object = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarText, setSnackbarText] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
   const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />;
   });
 
-  const OpenSnackbar = (text) => {
+  const OpenSnackbar = (text, severity = "success") => {
     setSnackbarText(text);
+    setSnackbarSeverity(severity);
     setSnackbarOpen(true);
   };
+
 
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -44,14 +47,14 @@ const Object = () => {
     // Use the AddNewObjection service to send the data
     ObjectionsService.AddNewObjection(formData)
       .then(() => {
-        OpenSnackbar('Objection submitted successfully!');
+        OpenSnackbar('Objection submitted successfully!', 'success');
         // Clear the form
         setObjectionText('');
         setSelectedFile(null);
       })
       .catch((error) => {
         console.error('Error submitting objection:', error);
-        OpenSnackbar('Error submitting objection. Please try again.');
+        OpenSnackbar('Error submitting objection. Please try again.', 'error');
       });
   };
 
@@ -101,10 +104,11 @@ const Object = () => {
         autoHideDuration={5000}
         onClose={handleClose}
       >
-        <Alert onClose={handleClose} severity='success' sx={{ width: "100%" }}>
+        <Alert onClose={handleClose} severity={snackbarSeverity} sx={{ width: "100%" }}>
           {snackbarText}
         </Alert>
       </Snackbar>
+
     </>
   );
 };
