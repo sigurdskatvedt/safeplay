@@ -39,7 +39,7 @@ CSRF_TRUSTED_ORIGINS = [URL]
 # Usage: https://docs.djangoproject.com/en/3.1/topics/email/#obtaining-an-instance-of-an-email-backend
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.stud.ntnu.no"
-EMAIL_USE_TLS = False
+EMAIL_USE_TLS = True
 EMAIL_PORT = 25
 DEFAULT_FROM_EMAIL = "tdt4237-group" + GROUP_ID + " " + "<noreply@idi.ntnu.no>"
 
