@@ -1,5 +1,6 @@
 import { Container, Grid, Snackbar, Typography } from "@mui/material";
 import MuiAlert from "@mui/material/Alert";
+import { wait } from "@testing-library/user-event/dist/utils";
 import React, { useState, useEffect } from "react";
 import ConsentRequestsService from "../services/consentRequests";
 import Request from "./Request"; // You might want to rename this component to ConsentRequest or similar
@@ -37,6 +38,7 @@ const ConsentRequests = ({ user }) => {
       .catch((error) => {
         console.log(error);
       });
+
     ConsentRequestsService.fetchPastRequests()
       .then((response) => {
         setPastRequests(response);
@@ -68,7 +70,7 @@ const ConsentRequests = ({ user }) => {
 
           <Grid container padding={2} spacing={5} justifyContent='center'>
             {requests.map((r) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} xl={3} key={r.id}>
+              <Grid item xs={12} sm={6} md={4} lg={3} xl={3} key={`pending_${r.id}`}>
                 <Request
                   user={user}
                   consentRequest={r}
@@ -85,7 +87,7 @@ const ConsentRequests = ({ user }) => {
 
           <Grid container padding={2} spacing={5} justifyContent='center'>
             {pastRequests.map((r) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} xl={3} key={r.id}>
+              <Grid item xs={12} sm={6} md={4} lg={3} xl={3} key={`past_${r.id}`}>
                 <Request
                   user={user}
                   consentRequest={r}
@@ -113,4 +115,3 @@ const ConsentRequests = ({ user }) => {
 };
 
 export default ConsentRequests;
-
