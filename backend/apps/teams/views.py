@@ -7,8 +7,6 @@ from rest_framework.exceptions import PermissionDenied
 
 
 class TeamListView(mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
-
     queryset = Team.objects.all()
     serializer_class = TeamSerializer
 
