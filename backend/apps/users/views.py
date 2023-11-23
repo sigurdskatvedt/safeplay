@@ -102,8 +102,6 @@ class VerificationView(generics.GenericAPIView):
         try:
             username = urlsafe_base64_decode(uid).decode()
             user = get_user_model().objects.filter(username=username).first()
-            if (datetime.now(timezone.utc) - user.verify_email_timer > timedelta(minutes=60)):
-                return redirect(invalid_url)
 
             if not PasswordResetTokenGenerator().check_token(user, token):  # Verify that the token is valid for user
                 return redirect(invalid_url)
