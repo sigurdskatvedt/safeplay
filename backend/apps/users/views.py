@@ -11,7 +11,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.conf import settings
 from django.core.mail import EmailMessage
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.urls import reverse
+from django.urls import reverse_lazy
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.encoding import force_bytes, force_str
 from datetime import datetime, timedelta, timezone
@@ -95,21 +95,27 @@ class RefreshViewSet(viewsets.ViewSet, TokenRefreshView):
 class VerificationView(generics.GenericAPIView):
     """View for verifying user registration links"""
 
-    def get(self, request, uid):
+    def get(self, request, uid, token):  # Added variable 'token' in get()
         verified_url = settings.URL + "/verified"
         invalid_url = settings.URL + "/invalid"
+
         try:
             username = urlsafe_base64_decode(uid).decode()
             user = get_user_model().objects.filter(username=username).first()
+            if (datetime.now(timezone.utc) - user.verify_email_timer > timedelta(minutes=60)):
+                return redirect(invalid_url)
+
+            if not PasswordResetTokenGenerator().check_token(user, token):  # Verify that the token is valid for user
+                return redirect(invalid_url)
             user.is_active = True  # Activate user
             user.save()
-
             return redirect(verified_url)
 
         except Exception as ex:
             pass
 
         return redirect(invalid_url)
+
 
 
 class PasswordResetEmailView(generics.GenericAPIView):
@@ -128,7 +134,7 @@ class PasswordResetEmailView(generics.GenericAPIView):
                 uid = urlsafe_base64_encode(force_bytes(user.pk))
                 domain = get_current_site(request).domain
                 token = PasswordResetTokenGenerator().make_token(user)  # Generate token
-                link = reverse(
+                link = reverse_lazy(
                     'password-reset', kwargs={"uidb64": uid, "token": token})
 
                 url = f"{settings.PROTOCOL}://{domain}{link}"
@@ -141,6 +147,39 @@ class PasswordResetEmailView(generics.GenericAPIView):
                 )
                 mail.send(fail_silently=False)
         return Response({'success': "If the user exists, you will shortly receive a link to reset your password."}, status=status.HTTP_200_OK)
+
+
+class ActivationLinkEmailView(generics.GenericAPIView):
+    serializer_class = SendNewEmailSerializer
+
+    def post(self, request):
+        if request.data.get("email") and request.data.get("username"):
+            email = request.data["email"]
+            username = request.data["username"]
+
+            user = get_user_model().objects.get(email=email, username=username)
+            user.verify_email_timer = datetime.now(timezone.utc)
+            user.save()
+
+            if user.is_active != True:
+
+                email_subject = "Activate your account"
+                uid = urlsafe_base64_encode(user.username.encode())
+                domain = get_current_site(request).domain
+                token = PasswordResetTokenGenerator().make_token(user)
+                link = reverse_lazy(
+                    'verify-email', kwargs={"uid": uid, "token": token})
+
+                url = f"{settings.PROTOCOL}://{domain}{link}"
+
+                mail = EmailMessage(
+                    email_subject,
+                    url,
+                    None,
+                    [email],
+                )
+                mail.send(fail_silently=False)
+        return Response({'success': "If the user is not activated, you will shortly receive a link to reset your password."}, status=status.HTTP_200_OK)
 
 
 class ResetPasswordView(generics.GenericAPIView):
