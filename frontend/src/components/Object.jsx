@@ -77,7 +77,7 @@ const Object = () => {
         />
 
         <Button variant='contained' component='label'>
-          Upload Additional Documents
+          Upload Additional Documents (PDF-format only)
           <input
             hidden
             type='file'
