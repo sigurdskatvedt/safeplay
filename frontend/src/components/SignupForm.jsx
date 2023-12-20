@@ -63,8 +63,8 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
 
   useEffect(() => {
     const age = calculateAge(birthdate);
-    setShowGuardianField(age < 15);
-  }, [birthdate]);
+    setShowGuardianField(age < 15 && userType == "player");
+  }, [birthdate, userType]);
 
   const handleChangeUserType = (event) => {
     setUserType(event.target.value);
