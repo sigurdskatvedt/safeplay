@@ -58,7 +58,7 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
     # Hosts for production
-    'molde.idi.ntnu.no',
+    'tdt4237.idi.ntnu.no',
 ]
 
 CORS_ALLOWED_ORIGINS = [
