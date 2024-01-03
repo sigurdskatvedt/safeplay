@@ -9,7 +9,7 @@ from django.core import exceptions
 from django.core.mail import EmailMessage
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib.sites.shortcuts import get_current_site
-from django.urls import reverse
+from django.urls import reverse_lazy
 from django.conf import settings
 from .models import User, Team
 from rest_framework.exceptions import AuthenticationFailed
@@ -89,7 +89,9 @@ class RegisterSerializer(UserSerializer):
         email_subject = "Activate your account"
         uid = urlsafe_base64_encode(user.username.encode())
         domain = get_current_site(self.context["request"])
-        link = reverse('verify-email', kwargs={"uid": uid})
+        token = PasswordResetTokenGenerator().make_token(user)
+        # Added token to link variable
+        link = reverse_lazy('verify-email', kwargs={"uid": uid, "token": token})
         url = f"{settings.PROTOCOL}://{domain}{link}"
         mail = EmailMessage(
             email_subject,
@@ -99,6 +101,8 @@ class RegisterSerializer(UserSerializer):
         )
 
         mail.send(fail_silently=False)
+
+        return user
 
     def validate(self, data):
 
