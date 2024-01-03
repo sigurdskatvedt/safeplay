@@ -143,6 +143,7 @@ const LoginForm = ({ setUser, setAppSnackbarOpen, setAppSnackbarText }) => {
 
               <Link
                 component='button'
+                type='button'  // Add this line
                 underline='hover'
                 onClick={handleClickOpen}
               >
