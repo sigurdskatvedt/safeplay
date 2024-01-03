@@ -121,6 +121,7 @@ class RegisterSerializer(UserSerializer):
             try:
                 guardian = get_user_model().objects.get(username=guardian_username)
                 data['guardian'] = guardian
+                del data['guardian_username']  # Remove guardian_username from validated_data
             except get_user_model().DoesNotExist:
                 raise serializers.ValidationError(
                     {"guardian_username": "A user with this username does not exist."})
