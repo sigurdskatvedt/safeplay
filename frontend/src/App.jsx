@@ -51,6 +51,12 @@ const App = () => {
     }
   }, []);
 
+  const updateUser = (newUser) => {
+    setUser(newUser);
+    window.localStorage.setItem("user", JSON.stringify(newUser)); // Update local storage if needed
+  };
+
+
   return (
     <Router>
       <AppBar position='static'>
@@ -61,39 +67,11 @@ const App = () => {
                 <Avatar alt='Home' src='favicon.ico' />
               </Button>
             </Grid>
-            {user?.user_type === 'manager' ? (  // Updated condition
-              <Grid item marginTop={0.8}>
-                <Button color='inherit' component={Link} to='/matches'>
-                  Overview
-                </Button>
-              </Grid>
-            ) : null}
-            {user?.user_type === 'manager' ? (  // Updated condition
-              <>
-                <Grid item marginTop={0.8}>
-                  <Button color='inherit' component={Link} to='/create-match'>
-                    Create New Match
-                  </Button>
-                </Grid>
-                <Grid item marginTop={0.8}>
-                  <Button color='inherit' component={Link} to='/create-team'>
-                    Create New Team
-                  </Button>
-                </Grid>
-              </>
-            ) : null}
             <Grid item marginTop={0.8}>
               <Button color='inherit' component={Link} to='/object'>
                 Object
               </Button>
             </Grid>
-            {user?.user_type === 'guardian' || user?.user_type === 'player' ? (  // Updated condition
-              <Grid item marginTop={0.8}>
-                <Button color='inherit' component={Link} to='/consent-requests'>
-                  Consent Requests
-                </Button>
-              </Grid>
-            ) : null}
             {user && (
               <Grid item marginTop={0.8}>
                 <Button color='inherit' component={Link} to='/privacy-notice'>
@@ -101,6 +79,38 @@ const App = () => {
                 </Button>
               </Grid>
             )}
+            {user?.user_type === 'manager' ? (  // Check if user is a manager
+              <>
+                {user.team_id ? (  // Check if user is part of a team
+                  <>
+                    <Grid item marginTop={0.8}>
+                      <Button color='inherit' component={Link} to='/matches'>
+                        Matches
+                      </Button>
+                    </Grid>
+                    <Grid item marginTop={0.8}>
+                      <Button color='inherit' component={Link} to='/create-match'>
+                        Create New Match
+                      </Button>
+                    </Grid>
+                  </>
+                ) : (
+                  <Grid item marginTop={0.8}>
+                    <Button color='inherit' component={Link} to='/create-team'>
+                      Create New Team
+                    </Button>
+                  </Grid>
+                )}
+              </>
+            ) : null}
+
+            {user?.user_type === 'guardian' || user?.user_type === 'player' ? (  // Updated condition
+              <Grid item marginTop={0.8}>
+                <Button color='inherit' component={Link} to='/consent-requests'>
+                  Consent Requests
+                </Button>
+              </Grid>
+            ) : null}
           </Grid>
           <Grid container justifyContent='flex-end'>
             <Grid item>
@@ -172,7 +182,7 @@ const App = () => {
 
           <Route path='/object' element={<Object />} />
           <Route path='/privacy-notice' element={<PrivacyNotice />} />
-          <Route path='/create-team' element={<TeamCreation />} />
+          <Route path='/create-team' element={<TeamCreation user={user} updateUser={updateUser} />} />
 
           <Route path='/' element={<Home setUser={setUser} />} />
         </Routes>

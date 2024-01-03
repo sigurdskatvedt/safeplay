@@ -35,7 +35,7 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
   const [snackbarText, setSnackbarText] = useState("");
   const [snackbarType, setSnackbarType] = useState("success");
   const [birthdate, setBirthdate] = React.useState(new Date().toISOString().split('T')[0]);
-  const [userType, setUserType] = React.useState("player");
+  const [userType, setUserType] = React.useState("manager");
   const [currentTeam, setCurrentTeam] = useState("");
   const [teams, setTeams] = useState([]);
 
@@ -103,9 +103,13 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
       password: password,
       user_type: userType, // Send the selected user type to the backend
       birthdate: birthdate,
-      team_id: currentTeam,
       guardian_username: showGuardianField ? guardianUsername : undefined,
     };
+
+    if (userType !== 'manager') {
+      request.team_id = currentTeam;
+    }
+
     AuthService.createUser(request)
       .then((response) => {
         console.log("User registered successfully");
@@ -148,28 +152,30 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
                 value={userType}
                 onChange={handleChangeUserType}
               >
-                <FormControlLabel value="player" control={<Radio />} label="Player" />
-                <FormControlLabel value="guardian" control={<Radio />} label="Guardian" />
                 <FormControlLabel value="manager" control={<Radio />} label="Manager" />
+                <FormControlLabel value="guardian" control={<Radio />} label="Guardian" />
+                <FormControlLabel value="player" control={<Radio />} label="Player" />
               </RadioGroup>
             </FormControl>
-            <FormControl>
-              <FormLabel>Team</FormLabel>
-              <Box display="flex" alignItems="center">
-                <Select
-                  value={currentTeam}
-                  onChange={handleTeamChange}
-                  fullWidth
-                  style={{ flexGrow: 1 }}
-                >
-                  {teams.map((teamItem) => (
-                    <MenuItem key={teamItem.id} value={teamItem.id}>
-                      {teamItem.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </Box>
-            </FormControl>
+            {userType !== 'manager' && (
+              <FormControl>
+                <FormLabel>Team</FormLabel>
+                <Box display="flex" alignItems="center">
+                  <Select
+                    value={currentTeam}
+                    onChange={handleTeamChange}
+                    fullWidth
+                    style={{ flexGrow: 1 }}
+                  >
+                    {teams.map((teamItem) => (
+                      <MenuItem key={teamItem.id} value={teamItem.id}>
+                        {teamItem.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </Box>
+              </FormControl>
+            )}
             {userType === 'player' && (
               <>
                 <TextField
