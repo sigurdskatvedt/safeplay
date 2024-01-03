@@ -67,6 +67,13 @@ const sendNewEmail = (credentials) => {
   return request.then((response) => response.data);
 };
 
+const setTeamForCurrentUser = (teamId) => {
+  return api.post(`/users/set_team/`, { team_id: teamId }).then((response) => {
+    return response.data;
+  });
+};
+
+
 const AuthService = {
   createUser,
   login,
@@ -77,6 +84,7 @@ const AuthService = {
   sendNewEmail,
   createTeam,
   fetchTeams,
+  setTeamForCurrentUser,
 };
 
 export default AuthService;

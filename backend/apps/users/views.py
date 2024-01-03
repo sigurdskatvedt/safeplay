@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from rest_framework import permissions, viewsets, status, generics
-from apps.users.serializers import UserSerializer, RegisterSerializer, ResetPasswordSerializer, LoginSerializer, SendNewEmailSerializer,  SetNewPasswordSerializer
+from apps.users.serializers import UserSerializer, RegisterSerializer, ResetPasswordSerializer, LoginSerializer, SendNewEmailSerializer,  SetNewPasswordSerializer, AssignTeamSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -15,12 +15,12 @@ from django.urls import reverse_lazy
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.encoding import force_bytes, force_str
 from datetime import datetime, timedelta, timezone
+from rest_framework.decorators import action
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    """ViewSet for viewing user instances"""
+    """ViewSet for viewing and editing user instances"""
 
-    http_method_names = ['get']
     serializer_class = UserSerializer
     permission_classes = (IsAuthenticated,)
 
@@ -32,6 +32,22 @@ class UserViewSet(viewsets.ModelViewSet):
             return get_user_model().objects.filter(guardian=user)
         else:
             return get_user_model().objects.filter(pk=user.id)
+
+    @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
+    def set_team(self, request):
+        user = request.user
+        # Check if the user already has a team assigned
+        if user.team:
+            return Response({"error": "Team already set"}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = AssignTeamSerializer(user, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"status": "team set"})
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 
 class RegistrationViewSet(viewsets.ModelViewSet, TokenObtainPairView):

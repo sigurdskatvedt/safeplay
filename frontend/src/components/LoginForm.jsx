@@ -88,9 +88,15 @@ const LoginForm = ({ setUser, setAppSnackbarOpen, setAppSnackbarText }) => {
         setUsername("");
         setPassword("");
         setUser(response.user);
-        if (response.user.is_staff) {
-          navigate("/approve-certifications");
-        } else {
+        if (response.user.user_type == "manager") {
+          if (response.user.team_id) {
+            navigate("/matches");
+          }
+          else {
+            navigate("/create-team")
+          }
+        }
+        else {
           navigate("/consent-requests");
         }
         setAppSnackbarText("Signed in successfully");

@@ -197,4 +197,15 @@ class SetNewPasswordSerializer(serializers.Serializer):
 
         return user
 
-        return user
+class AssignTeamSerializer(serializers.ModelSerializer):
+    team_id = serializers.IntegerField()
+
+    class Meta:
+        model = get_user_model()
+        fields = ['team_id']
+
+    def update(self, instance, validated_data):
+        instance.team_id = validated_data['team_id']
+        instance.save()
+        return instance
+
