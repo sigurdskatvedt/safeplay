@@ -3,8 +3,8 @@ from .models import Field, Booking
 
 @admin.register(Field)
 class FieldAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'location')
-    search_fields = ('name', 'location')
+    list_display = ('id', 'name')
+    search_fields = ('name',)
 
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
