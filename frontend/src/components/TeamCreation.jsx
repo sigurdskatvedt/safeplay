@@ -26,6 +26,7 @@ const TeamCreation = ({ user, updateUser }) => {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarType, setSnackbarType] = useState('success');
   const [teams, setTeams] = useState([]);
+  const [isTeamNameEmpty, setIsTeamNameEmpty] = useState(false); // New state variable for tracking empty team name
 
   const fetchTeams = () => {
     AuthService.fetchTeams()
@@ -42,6 +43,15 @@ const TeamCreation = ({ user, updateUser }) => {
   }, []);
 
   const handleAddTeam = () => {
+    if (!newTeamName.trim()) {
+      // Check if team name is empty
+      setIsTeamNameEmpty(true); // Set the empty state to true
+      setSnackbarMessage('Fill in required fields');
+      setSnackbarType('error');
+      setSnackbarOpen(true);
+      return; // Prevent further execution
+    }
+
     const request = {
       name: newTeamName,
     };
@@ -157,10 +167,15 @@ const TeamCreation = ({ user, updateUser }) => {
             id='teamName'
             label='Team Name'
             value={newTeamName}
-            onChange={(e) => setNewTeamName(e.target.value)}
+            onChange={(e) => {
+              setNewTeamName(e.target.value);
+              setIsTeamNameEmpty(false); // Reset the empty state when the user types something
+            }}
             fullWidth
             variant='standard'
-            require
+            required
+            error={isTeamNameEmpty} // Apply the error state conditionally
+            helperText={isTeamNameEmpty ? "Team name is required" : ""} // Display helper text conditionally
           />
           <Button onClick={handleAddTeam} color="primary">
             Add Team
