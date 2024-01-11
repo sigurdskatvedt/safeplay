@@ -34,6 +34,7 @@ class CreateMatchView(APIView):
         team1_id = request.data.get('team1')
         team2_id = request.data.get('team2')
         field_id = request.data.get('field')
+        description = request.data.get('description')
         date_time = request.data.get('date_time')
         user_timezone_str = request.data.get(
             'timezone', 'UTC')  # Default to UTC if not provided
@@ -77,7 +78,7 @@ class CreateMatchView(APIView):
             team1=team1,
             team2=team2,
             date_time=start_time_utc,
-            # Assuming you add a booking field to the Match model
+            description=description,
             booking=new_booking
         )
 

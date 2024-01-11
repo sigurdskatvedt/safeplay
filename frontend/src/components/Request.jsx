@@ -114,7 +114,11 @@ const ConsentRequestCard = ({ consentRequest, update, OpenSnackbar }) => {
         <Divider sx={{ my: 1 }} />
 
         <Typography component="div" variant='body2' color="text.secondary" gutterBottom>
-          <div dangerouslySetInnerHTML={{ __html: `Player: ${consentRequest.user.first_name} ${consentRequest.user.last_name}` }}></div>
+          Player: {consentRequest.user.first_name} {consentRequest.user.last_name}
+        </Typography>
+
+        <Typography component="div" variant='body2' color="text.secondary" gutterBottom>
+          <div dangerouslySetInnerHTML={{ __html: `Description: ${consentRequest.match.description}` }}></div>
         </Typography>
 
         <Stack direction="row" alignItems="center" spacing={1}>

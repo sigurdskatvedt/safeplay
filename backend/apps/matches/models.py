@@ -12,6 +12,7 @@ class Match(models.Model):
     team2 = models.ForeignKey(
         Team, related_name='away_matches', on_delete=models.CASCADE)
     date_time = models.DateTimeField()
+    description = models.TextField(null=True, blank=True)
     booking = models.ForeignKey(
         Booking, related_name='matches', on_delete=models.CASCADE)
 

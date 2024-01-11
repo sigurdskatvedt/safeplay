@@ -27,6 +27,7 @@ const CreateMatch = () => {
     team1: '',
     team2: '',
     field: '',
+    description: '',
     date: '',
     time: '',
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -87,6 +88,7 @@ const CreateMatch = () => {
       team1: formData.team1,
       team2: formData.team2,
       field: formData.field,
+      description: formData.description,
       date_time: dateTime,
       timezone: formData.timezone,
     };
@@ -172,6 +174,18 @@ const CreateMatch = () => {
             </MenuItem>
           ))}
         </TextField>
+
+        <TextField
+          fullWidth
+          margin="normal"
+          label="Description"
+          name="description"
+          variant="outlined"
+          multiline  // Enable multiline
+          minRows={3} // Set minimum rows
+          value={formData.description}
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+        />
 
         <FormControl fullWidth margin="normal">
           <InputLabel id="field-label">Field</InputLabel>
