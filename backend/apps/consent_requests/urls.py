@@ -1,19 +1,17 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-from .views import UserConsentRequestViewSet
-from apps.consent_requests import views
-
-router = DefaultRouter()
-router.register(r'user-requests', UserConsentRequestViewSet,
-                basename='user-consent-request')
-
+from django.urls import path
+from .views import UserConsentRequestViewSet, ApproveRequestView, RemoveApprovalView, PastConsentRequestsView
 
 urlpatterns = [
-    path('', include(router.urls)),
-    path('approve/', views.ApproveRequestView.as_view(),
-         name='approve_request'),
-    path('remove-approval/', views.RemoveApprovalView.as_view(),
-         name='remove_approval'),
-    path('past-requests/', views.PastConsentRequestsView.as_view(),
-         name='past_requests'),
+    # Manually define URL for listing consent requests
+    path('consent-requests/', UserConsentRequestViewSet.as_view({'get': 'list'}), name='consent-request-list'),
+
+    # URL pattern for approving a request (already defined)
+    path('consent-requests/approve/', ApproveRequestView.as_view(), name='approve_request'),
+
+    # URL pattern for removing approval (already defined)
+    path('consent-requests/remove-approval/', RemoveApprovalView.as_view(), name='remove_approval'),
+
+    # URL pattern for listing past requests (already defined)
+    path('consent-requests/past-requests/', PastConsentRequestsView.as_view(), name='past_requests'),
 ]
+

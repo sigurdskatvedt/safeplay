@@ -6,7 +6,7 @@ const GetMatches = () => {
 };
 
 const CreateMatch = (matchData) => {
-  const request = api.post("/create_match/", matchData);
+  const request = api.post("matches/create_match/", matchData);
   return request.then((response) => response.data);
 };
 

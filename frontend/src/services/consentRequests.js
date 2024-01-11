@@ -1,7 +1,7 @@
 import api from "./api";
 
 const fetchPendingRequests = () => {
-  return api.get("/user-requests/").then((response) => response.data);
+  return api.get("/consent-requests/").then((response) => response.data);
 };
 
 const fetchPastRequests = () => {

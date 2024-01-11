@@ -20,9 +20,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('apps.users.urls')),
     path('api/', include('apps.teams.urls')),
-    path('api/', include('apps.matches.urls')),
-    path('api/', include('apps.consent_requests.urls')),
-    path('api/', include('apps.objections.urls')),
-    path('api/', include('apps.fields.urls')),  # Updated line
+    path('api/', include('apps.matches.urls')), #this 
+    path('api/', include('apps.consent_requests.urls')), #this
+    path('api/', include('apps.objections.urls')), #this
+    path('api/', include('apps.fields.urls')), 
 
 ]
