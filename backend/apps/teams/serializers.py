@@ -5,5 +5,5 @@ from rest_framework.permissions import BasePermission, IsAuthenticated
 class TeamSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
-        fields = ['id', 'name', 'description', 'created_at', 'updated_at']
+        fields = ['id', 'name', 'created_at', 'updated_at']
 

@@ -26,7 +26,6 @@ const TeamCreation = ({ user, updateUser }) => {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarType, setSnackbarType] = useState('success');
   const [teams, setTeams] = useState([]);
-  const [newTeamDescription, setNewTeamDescription] = useState(''); // New state for team description
 
   const fetchTeams = () => {
     AuthService.fetchTeams()
@@ -45,13 +44,11 @@ const TeamCreation = ({ user, updateUser }) => {
   const handleAddTeam = () => {
     const request = {
       name: newTeamName,
-      description: newTeamDescription // Include description in the request
     };
 
     AuthService.createTeam(request)
       .then(() => {
         setNewTeamName('');
-        setNewTeamDescription(''); // Clear the description field
         fetchTeams(); // Refetch teams
         setSnackbarMessage('Team created successfully!');
         setSnackbarType('success');
@@ -125,7 +122,6 @@ const TeamCreation = ({ user, updateUser }) => {
               <TableHead>
                 <TableRow>
                   <TableCell style={{ fontWeight: 'bold' }}>Team Name</TableCell>
-                  <TableCell style={{ fontWeight: 'bold' }}>Description</TableCell>
                   <TableCell style={{ fontWeight: 'bold' }}>Action</TableCell> {/* Add this line */}
                 </TableRow>
               </TableHead>
@@ -138,8 +134,7 @@ const TeamCreation = ({ user, updateUser }) => {
                     <TableCell component="th" scope="row">
                       {team.name}
                     </TableCell>
-                    <TableCell>{team.description}</TableCell>
-                    <TableCell> {/* Add this TableCell */}
+                    <TableCell>
                       <Button
                         variant="contained"
                         color="primary"
@@ -166,17 +161,6 @@ const TeamCreation = ({ user, updateUser }) => {
             fullWidth
             variant='standard'
             require
-          />
-          <TextField
-            margin='dense'
-            id='teamDescription'
-            label='Team Description'
-            value={newTeamDescription}
-            onChange={(e) => setNewTeamDescription(e.target.value)}
-            fullWidth
-            variant='standard'
-            inputProps={{ maxLength: 255 }}
-            required
           />
           <Button onClick={handleAddTeam} color="primary">
             Add Team

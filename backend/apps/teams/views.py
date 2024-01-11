@@ -19,8 +19,4 @@ class TeamListView(mixins.ListModelMixin, mixins.CreateModelMixin, generics.Gene
         if user.user_type != 'manager':
             raise PermissionDenied("Only managers can create teams")
 
-        description = request.data.get('description', '')
-        if len(description) > 255:
-            return Response({'error': 'Description must be less than 256 characters.'}, status=status.HTTP_400_BAD_REQUEST)
-
         return self.create(request, *args, **kwargs)
