@@ -36,7 +36,23 @@ const CreateMatch = () => {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarStyle, setSnackbarStyle] = useState({});
 
-  const [fields, setFields] = useState([]); // State to store fields data
+  const [fields, setFields] = useState([]); 
+
+  const [validationErrors, setValidationErrors] = useState({});
+
+  const validateForm = () => {
+    const errors = {};
+    if (!formData.team1) errors.team1 = 'Team 1 is required';
+    if (!formData.team2) errors.team2 = 'Team 2 is required';
+    if (!formData.field) errors.field = 'Field is required';
+    if (!formData.description) errors.description = 'Description is required';
+    if (!formData.date) errors.date = 'Date is required';
+    if (!formData.time) errors.time = 'Time is required';
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
 
   useEffect(() => {
     AuthService.fetchTeams()
@@ -79,6 +95,7 @@ const CreateMatch = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    if (!validateForm()) return;
 
     // Combine date and time into a single date_time field
     const dateTime = `${formData.date.format('YYYY-MM-DD')}T${formData.time}:00`;
@@ -150,6 +167,8 @@ const CreateMatch = () => {
           select
           value={formData.team1}
           onChange={(e) => setFormData({ ...formData, team1: e.target.value })}
+          error={!!validationErrors.team1}
+          helperText={validationErrors.team1}
         >
           {teams.map((team) => (
             <MenuItem key={team.id} value={team.id}>
@@ -167,6 +186,8 @@ const CreateMatch = () => {
           select
           value={formData.team2}
           onChange={(e) => setFormData({ ...formData, team2: e.target.value })}
+          error={!!validationErrors.team2}
+          helperText={validationErrors.team2}
         >
           {teams.map((team) => (
             <MenuItem key={team.id} value={team.id}>
@@ -185,6 +206,8 @@ const CreateMatch = () => {
           minRows={3} // Set minimum rows
           value={formData.description}
           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          error={!!validationErrors.description}
+          helperText={validationErrors.description}
         />
 
         <FormControl fullWidth margin="normal">
@@ -195,6 +218,8 @@ const CreateMatch = () => {
             value={formData.field}
             label="Field"
             onChange={(e) => setFormData({ ...formData, field: e.target.value })}
+            error={!!validationErrors.field}
+            helperText={validationErrors.field}
           >
             {fields.map((field) => (
               <MenuItem key={field.id} value={field.id}>
