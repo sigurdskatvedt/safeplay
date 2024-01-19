@@ -19,7 +19,6 @@ const Matches = () => {
   const fetchMatches = async () => {
     try {
       const matchesData = await MatchesService.GetMatches();
-      console.log(matchesData); // Log the fetched matches data
 
       const upcomingMatches = matchesData.filter(match => new Date(match.date_time) > new Date()).map(match => {
         const pending = match.consent_requests.filter(request => request.request_status === 'pending').length;

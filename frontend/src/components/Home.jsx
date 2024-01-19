@@ -13,8 +13,8 @@ const Home = ({ setUser }) => {
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON);
       setUser(user);
-      if (user.is_staff) {
-        navigate("/approve-certifications");
+      if (user.user_type === "manager") {
+        navigate("/");
       } else {
         navigate("/consent-requests");
       }
