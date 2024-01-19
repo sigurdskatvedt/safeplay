@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Link, Navigate } from "react-router-dom";
 import Container from "@mui/material/Container";
 import AppBar from "@mui/material/AppBar";
 import Grid from "@mui/material/Grid";
@@ -16,7 +16,6 @@ import CreateMatch from "./components/CreateMatch";
 import ConsentRequests from "./components/ConsentRequests";
 import ResetPassword from "./components/ResetPassword";
 import Verified from "./components/Verified";
-import Invalid from "./components/Invalid";
 import Object from "./components/Object";
 import TeamCreation from "./components/TeamCreation";
 import PrivacyNotice from './components/PrivacyNotice';
@@ -55,6 +54,19 @@ const App = () => {
     setUser(newUser);
     window.localStorage.setItem("user", JSON.stringify(newUser)); // Update local storage if needed
   };
+
+  const renderHomeOrRedirect = () => {
+    if (!user) {
+      return <Home setUser={setUser} />;
+    } else if (user.user_type === 'manager') {
+      return <Navigate to="/matches" />;
+    } else if (user.user_type === 'player' || user.user_type === 'guardian') {
+      return <Navigate to="/consent-requests" />;
+    } else {
+      return <Home setUser={setUser} />; // Default case if none of the above conditions are met
+    }
+  };
+
 
 
   return (
@@ -146,45 +158,51 @@ const App = () => {
         <Routes>
           <Route
             path='/matches'
-            element={<Matches user={user} />}
+            element={user?.user_type === 'manager' ? <Matches user={user} /> : <Navigate to="/" />}
           />
           <Route
             path='/create-match'
-            element={<CreateMatch user={user} />}
+            element={user?.user_type === 'manager' ? <CreateMatch user={user} /> : <Navigate to="/" />}
           />
-          <Route path='/consent-requests' element={<ConsentRequests user={user} />} />
-
           <Route
-            path='login'
-            element={
-              <LoginForm
-                setAppSnackbarOpen={setSnackbarOpen}
-                setAppSnackbarText={setSnackbarText}
-                setUser={setUser}
+            path='/consent-requests'
+            element={(user?.user_type === 'player' || user?.user_type === 'guardian') ? <ConsentRequests user={user} /> : <Navigate to="/" />} />
+
+          {!user && (
+            <>
+              <Route
+                path='/login'
+                element={
+                  <LoginForm
+                    setAppSnackbarOpen={setSnackbarOpen}
+                    setAppSnackbarText={setSnackbarText}
+                    setUser={setUser}
+                  />
+                }
               />
-            }
-          />
-
-          <Route
-            path='/signup'
-            element={
-              <SignupForm
-                setAppSnackbarOpen={setSnackbarOpen}
-                setAppSnackbarText={setSnackbarText}
+              <Route
+                path='/signup'
+                element={
+                  <SignupForm
+                    setAppSnackbarOpen={setSnackbarOpen}
+                    setAppSnackbarText={setSnackbarText}
+                  />
+                }
               />
-            }
-          />
-
-          <Route path='/invalid' element={<Invalid />} />
-          <Route path='/verified' element={<Verified />} />
-
-          <Route path='/new_password' element={<ResetPassword />} />
+              <Route path='/verified' element={<Verified />} />
+              <Route path='/new_password' element={<ResetPassword />} />
+            </>
+          )}
 
           <Route path='/object' element={<Object />} />
           <Route path='/privacy-notice' element={<PrivacyNotice />} />
-          <Route path='/create-team' element={<TeamCreation user={user} updateUser={updateUser} />} />
+          <Route
+            path='/create-team'
+            element={user?.user_type === 'manager' ? <TeamCreation user={user} updateUser={updateUser} /> : <Navigate to="/" />}
+          />
 
-          <Route path='/' element={<Home setUser={setUser} />} />
+          <Route path='/' element={renderHomeOrRedirect()} />
+          <Route path='*' element={renderHomeOrRedirect()} />
         </Routes>
         <Snackbar
           anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
