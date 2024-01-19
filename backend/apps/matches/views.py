@@ -47,9 +47,6 @@ class CreateMatchView(APIView):
        # Convert to UTC
         start_time_utc = start_time_user_tz.astimezone(utc)
 
-        # Check if the match time is in the past
-        if start_time_utc < now():
-            return Response({'error': 'Cannot set matches in the past'}, status=status.HTTP_400_BAD_REQUEST)
         # Calculate end_time in UTC
         end_time_utc = start_time_utc + timedelta(hours=1)
 
