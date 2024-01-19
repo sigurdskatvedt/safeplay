@@ -111,17 +111,14 @@ class RefreshViewSet(viewsets.ViewSet, TokenRefreshView):
 class VerificationView(generics.GenericAPIView):
     """View for verifying user registration links"""
 
-    def get(self, request, uid, token):  # Added variable 'token' in get()
+    def get(self, request, uid):
         verified_url = settings.URL + "/verified"
         invalid_url = settings.URL + "/invalid"
 
         try:
             username = urlsafe_base64_decode(uid).decode()
             user = get_user_model().objects.filter(username=username).first()
-
-            if not PasswordResetTokenGenerator().check_token(user, token):  # Verify that the token is valid for user
-                return redirect(invalid_url)
-            user.is_active = True  # Activate user
+            user.is_active = True
             user.save()
             return redirect(verified_url)
 
@@ -180,9 +177,8 @@ class ActivationLinkEmailView(generics.GenericAPIView):
                 email_subject = "Activate your account"
                 uid = urlsafe_base64_encode(user.username.encode())
                 domain = get_current_site(request).domain
-                token = PasswordResetTokenGenerator().make_token(user)
                 link = reverse_lazy(
-                    'verify-email', kwargs={"uid": uid, "token": token})
+                    'verify-email', kwargs={"uid": uid})
 
                 url = f"{settings.PROTOCOL}://{domain}{link}"
 

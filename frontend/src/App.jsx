@@ -19,6 +19,7 @@ import Verified from "./components/Verified";
 import Object from "./components/Object";
 import TeamCreation from "./components/TeamCreation";
 import PrivacyNotice from './components/PrivacyNotice';
+import Invalid from './components/Invalid';
 import AuthService from "./services/auth";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
@@ -196,6 +197,7 @@ const App = () => {
 
           <Route path='/object' element={<Object />} />
           <Route path='/privacy-notice' element={<PrivacyNotice />} />
+          <Route path='/invalid' element={<Invalid />} />
           <Route
             path='/create-team'
             element={user?.user_type === 'manager' ? <TeamCreation user={user} updateUser={updateUser} /> : <Navigate to="/" />}

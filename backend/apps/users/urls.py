@@ -13,7 +13,7 @@ router.register('api/refresh', views.RefreshViewSet, basename='refresh')
 
 urlpatterns = [
         *router.urls,
-       path("api/verify-email/<uid>/<token>/",  # Added token to path
+       path("api/verify-email/<uid>",  
             views.VerificationView.as_view(), name="verify-email"),
        path('api/logout/', TokenBlacklistView.as_view(),
             name='logout'),
