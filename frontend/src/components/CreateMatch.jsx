@@ -110,6 +110,13 @@ const CreateMatch = () => {
       timezone: formData.timezone,
     };
 
+    if (formData.team1 === formData.team2) {
+        setSnackbarMessage('Use two different teams.');
+        setSnackbarStyle({ backgroundColor: 'red' });
+        setSnackbarOpen(true);
+      return
+    }
+
     MatchesService.AddMatch(dataToSubmit)
       .then((response) => {
         console.log('Match added successfully:', response);
