@@ -23,4 +23,5 @@ class Match(models.Model):
         if is_new:
             for team in [self.team1, self.team2]:
                 for user in team.members.all():
-                    ConsentRequest.objects.create(user=user, match=self)
+                    if (user.user_type == "player"):
+                        ConsentRequest.objects.create(user=user, match=self)
