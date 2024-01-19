@@ -22,7 +22,7 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 class Meta:
     model = get_user_model()
     fields = ['id', 'username', 'email',
-              'team_id', 'first_name', 'last_name', 'user_type', 'guardian']
+              'team_id', 'first_name', 'last_name', 'user_type', 'guardian', 'birthdate']
     read_only_fields = ['id']
 
 
@@ -32,7 +32,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
         fields = ['id', 'username', 'email',
-              'team_id', 'first_name', 'last_name', 'user_type', 'guardian']
+              'team_id', 'first_name', 'last_name', 'user_type', 'guardian', 'birthdate']
         read_only_fields = ['id']
 
 

@@ -13,17 +13,20 @@ const ConsentRequestCard = ({ consentRequest, update, OpenSnackbar }) => {
 
   const handleApprovalChange = (event) => {
     const newApprovalStatus = event.target.checked ? "accepted" : "declined";
-    const userType = consentRequest.user.user_type; // Assuming this is how you get the user type
-    const userBirthday = new Date(consentRequest.user.birthdate); // Assuming birthday is in a suitable format
-    const age = calculateAge(userBirthday); // Implement calculateAge function
+    const user = JSON.parse(window.localStorage.getItem("user"))
+    const userType = user.user_type;
+    const userBirthday = new Date(user.birthdate);
+    const age = calculateAge(userBirthday);
 
-    if (((userType === "player" && age > 15) || userType === "guardian") && !(consentRequest.request_status === "accepted")) {
-      // Show error or prevent change
-      OpenSnackbar("Only guardians can approve consent requests for players under 15 years old.", "error");
-      return;
-    }
+
 
     if (newApprovalStatus === "accepted") {
+      console.log(age)
+      if ((userType === "player" && age < 15)) {
+        // Show error or prevent change
+        OpenSnackbar("Only guardians can approve consent requests for players under 15 years old.", "error");
+        return;
+      }
       approveConsentRequest(consentRequest.request_id);
     } else {
       removeApproval(consentRequest.request_id);

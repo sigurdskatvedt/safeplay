@@ -5,15 +5,15 @@ const fetchPendingRequests = () => {
 };
 
 const fetchPastRequests = () => {
-    return api.get("past-requests/").then((response) => response.data);
+    return api.get("consent-requests/past-requests/").then((response) => response.data);
 };
 
 const approveRequest = (requestId) => {
-  return api.post(`/approve/`, requestId).then((response) => response.data);
+  return api.post(`consent-requests/approve/`, requestId).then((response) => response.data);
 };
 
 const removeApproval = (requestId) => {
-  return api.post(`/remove-approval/`, requestId).then((response) => response.data);
+  return api.post(`consent-requests/remove-approval/`, requestId).then((response) => response.data);
 };
 
 const ConsentRequestsService = {
