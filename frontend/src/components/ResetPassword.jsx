@@ -20,7 +20,7 @@ const ResetPassword = () => {
 
   const [snackbarOpen, setSnackbarOpen] = useState(false);
 
-  const handleClose = (event, reason) => {
+  const handleClose = (_, reason) => {
     if (reason === "clickaway") {
       return;
     }
@@ -29,7 +29,7 @@ const ResetPassword = () => {
 
   const [failSnackbarOpen, setFailSnackbarOpen] = useState(false);
 
-  const handleFailClose = (event, reason) => {
+  const handleFailClose = (_, reason) => {
     if (reason === "clickaway") {
       return;
     }

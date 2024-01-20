@@ -3,9 +3,6 @@ import TokenService from "./token";
 
 const instance = axios.create({
   baseURL:  process.env.REACT_APP_API_URL,
-//   headers: {
-//     "Content-Type": "application/json",
-//   },
 });
 
 instance.interceptors.request.use(
@@ -29,7 +26,6 @@ instance.interceptors.response.use(
     const originalConfig = err.config;
 
     if (originalConfig.url !== "/login/" && err.response && originalConfig.url !== "/refresh/") {
-      // Access Token was expired
       if (err.response.status === 401 && !originalConfig._retry) {
         originalConfig._retry = true;
 

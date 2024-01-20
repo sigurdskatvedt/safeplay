@@ -37,7 +37,7 @@ const LoginForm = ({ setUser, setAppSnackbarOpen, setAppSnackbarText }) => {
     setOpen(false);
   };
 
-  const handleClose = (event, reason) => {
+  const handleClose = (_, reason) => {
     if (reason === "clickaway") {
       return;
     }
@@ -50,7 +50,7 @@ const LoginForm = ({ setUser, setAppSnackbarOpen, setAppSnackbarText }) => {
     const request = { username: resetUser, email: email };
 
     AuthService.forgotPassword(request)
-      .then((response) => {
+      .then(() => {
         setOpen(false);
 
         console.log("Forgot password request sent");
@@ -60,7 +60,7 @@ const LoginForm = ({ setUser, setAppSnackbarOpen, setAppSnackbarText }) => {
         setAppSnackbarOpen(true);
       })
       .catch((err) => {
-        console.log("Forgot password request failed");
+        console.log("Forgot password request failed, error: ", err);
       });
   };
 
@@ -104,6 +104,7 @@ const LoginForm = ({ setUser, setAppSnackbarOpen, setAppSnackbarText }) => {
       })
       .catch((err) => {
         setSnackbarOpen(true);
+        console.log("Error: ", err)
         setUsernameErrorText("Wrong username or password");
         setPasswordErrorText("Wrong username or password");
       });
@@ -149,7 +150,7 @@ const LoginForm = ({ setUser, setAppSnackbarOpen, setAppSnackbarText }) => {
 
               <Link
                 component='button'
-                type='button'  // Add this line
+                type='button'
                 underline='hover'
                 onClick={handleClickOpen}
               >

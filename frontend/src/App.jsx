@@ -31,12 +31,12 @@ const App = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarText, setSnackbarText] = useState("");
 
-  const signOut = async () => {
-    await AuthService.logout();
+  const signOut = () => {
+    AuthService.logout();
     setUser(null);
   };
 
-  const handleClose = (event, reason) => {
+  const handleClose = (_, reason) => {
     if (reason === "clickaway") {
       return;
     }
@@ -53,7 +53,7 @@ const App = () => {
 
   const updateUser = (newUser) => {
     setUser(newUser);
-    window.localStorage.setItem("user", JSON.stringify(newUser)); // Update local storage if needed
+    window.localStorage.setItem("user", JSON.stringify(newUser));
   };
 
   const renderHomeOrRedirect = () => {
@@ -64,7 +64,7 @@ const App = () => {
     } else if (user.user_type === 'player' || user.user_type === 'guardian') {
       return <Navigate to="/consent-requests" />;
     } else {
-      return <Home setUser={setUser} />; // Default case if none of the above conditions are met
+      return <Home setUser={setUser} />;
     }
   };
 
@@ -92,9 +92,9 @@ const App = () => {
                 </Button>
               </Grid>
             )}
-            {user?.user_type === 'manager' ? (  // Check if user is a manager
+            {user?.user_type === 'manager' ? (
               <>
-                {user.team_id ? (  // Check if user is part of a team
+                {user.team_id ? (
                   <>
                     <Grid item marginTop={0.8}>
                       <Button color='inherit' component={Link} to='/matches'>
@@ -117,7 +117,7 @@ const App = () => {
               </>
             ) : null}
 
-            {user?.user_type === 'guardian' || user?.user_type === 'player' ? (  // Updated condition
+            {user?.user_type === 'guardian' || user?.user_type === 'player' ? (
               <Grid item marginTop={0.8}>
                 <Button color='inherit' component={Link} to='/consent-requests'>
                   Consent Requests

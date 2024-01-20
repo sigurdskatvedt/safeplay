@@ -2,21 +2,21 @@ import { Container, Grid, Snackbar, Typography } from "@mui/material";
 import MuiAlert from "@mui/material/Alert";
 import React, { useState, useEffect } from "react";
 import ConsentRequestsService from "../services/consentRequests";
-import Request from "./Request"; // You might want to rename this component to ConsentRequest or similar
+import Request from "./Request";
 
 const ConsentRequests = ({ user }) => {
   const [requests, setRequests] = useState([]);
-  const [pastRequests, setPastRequests] = useState([]); // New state variable for past requests
+  const [pastRequests, setPastRequests] = useState([]); 
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarText, setSnackbarText] = useState("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState("success"); // New state variable for Snackbar severity
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
 
   const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />;
   });
 
-  const handleClose = (event, reason) => {
+  const handleClose = (_, reason) => {
     if (reason === "clickaway") {
       return;
     }
@@ -25,7 +25,7 @@ const ConsentRequests = ({ user }) => {
 
   const OpenSnackbar = (text, severity = "success") => {
     setSnackbarText(text);
-    setSnackbarSeverity(severity); // Set the Snackbar severity
+    setSnackbarSeverity(severity);
     setSnackbarOpen(true);
   };
 

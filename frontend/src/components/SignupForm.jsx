@@ -21,7 +21,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />;
 });
 
-const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
+const SignupForm = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -51,7 +51,6 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
   };
 
   useEffect(() => {
-    // Make an API call to fetch teams
     AuthService.fetchTeams()
       .then(response => {
         setTeams(response);
@@ -70,7 +69,7 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
     setUserType(event.target.value);
   };
 
-  const handleClose = (event, reason) => {
+  const handleClose = (_, reason) => {
     if (reason === "clickaway") {
       return;
     }
@@ -92,7 +91,7 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
       setSnackbarText("Passwords do not match.");
       setSnackbarType("error");
       setSnackbarOpen(true);
-      return; // Prevent form submission
+      return;
     }
 
     const request = {
@@ -101,7 +100,7 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
       last_name: lastName,
       email: email,
       password: password,
-      user_type: userType, // Send the selected user type to the backend
+      user_type: userType,
       birthdate: birthdate,
       guardian_username: showGuardianField ? guardianUsername : undefined,
     };
@@ -111,7 +110,7 @@ const SignupForm = ({ setAppSnackbarOpen, setAppSnackbarText }) => {
     }
 
     AuthService.createUser(request)
-      .then((response) => {
+      .then(() => {
         console.log("User registered successfully");
         setSnackbarText(
           "If the email exists, an activation link has been sent."

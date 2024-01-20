@@ -12,14 +12,14 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { Typography } from '@mui/material';
 import AuthService from '../services/auth';
-import { useNavigate } from 'react-router-dom';  // Import useNavigate
+import { useNavigate } from 'react-router-dom';
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />;
 });
 
 const TeamCreation = ({ user, updateUser }) => {
-  const navigate = useNavigate();  // Initialize useNavigate
+  const navigate = useNavigate(); 
 
   const [newTeamName, setNewTeamName] = useState('');
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -44,12 +44,11 @@ const TeamCreation = ({ user, updateUser }) => {
 
   const handleAddTeam = () => {
     if (!newTeamName.trim()) {
-      // Check if team name is empty
-      setIsTeamNameEmpty(true); // Set the empty state to true
+      setIsTeamNameEmpty(true);
       setSnackbarMessage('Fill in required fields');
       setSnackbarType('error');
       setSnackbarOpen(true);
-      return; // Prevent further execution
+      return;
     }
 
     const request = {
@@ -73,14 +72,13 @@ const TeamCreation = ({ user, updateUser }) => {
   };
 
   const handleSetTeam = (teamId) => {
-    // Call the API to set the team for the current user
     AuthService.setTeamForCurrentUser(teamId)
       .then(() => {
         const updatedUser = { ...user, team_id: teamId };
         setSnackbarMessage('Team set successfully!');
         setSnackbarType('success');
         setSnackbarOpen(true);
-        updateUser(updatedUser); // Update the user object in App component
+        updateUser(updatedUser);
         navigate('/matches');
       })
       .catch((err) => {
@@ -92,7 +90,7 @@ const TeamCreation = ({ user, updateUser }) => {
   };
 
 
-  const handleCloseSnackbar = (event, reason) => {
+  const handleCloseSnackbar = (_, reason) => {
     if (reason === 'clickaway') {
       return;
     }
@@ -100,7 +98,6 @@ const TeamCreation = ({ user, updateUser }) => {
   };
 
   if (user === null) {
-    // User is not a manager, display appropriate message
     return (
       <div>
         <Typography variant="h6" gutterBottom>
@@ -110,12 +107,9 @@ const TeamCreation = ({ user, updateUser }) => {
     );
   }
 
-  // Check if user is a manager
   if (user.user_type === 'manager') {
     console.log(user);
-    // Check if the manager already has a team
     if (user.team_id) {
-      // Manager has a team, display appropriate message
       return (
         <div>
           <Typography variant="h6" gutterBottom>
@@ -124,7 +118,6 @@ const TeamCreation = ({ user, updateUser }) => {
         </div>
       );
     } else {
-      // Manager does not have a team, display the team creation form
       return (
         <div>
           <TableContainer component={Paper} style={{ marginTop: '20px', marginBottom: '20px' }}>
@@ -169,13 +162,13 @@ const TeamCreation = ({ user, updateUser }) => {
             value={newTeamName}
             onChange={(e) => {
               setNewTeamName(e.target.value);
-              setIsTeamNameEmpty(false); // Reset the empty state when the user types something
+              setIsTeamNameEmpty(false);
             }}
             fullWidth
             variant='standard'
             required
-            error={isTeamNameEmpty} // Apply the error state conditionally
-            helperText={isTeamNameEmpty ? "Team name is required" : ""} // Display helper text conditionally
+            error={isTeamNameEmpty}
+            helperText={isTeamNameEmpty ? "Team name is required" : ""}
           />
           <Button onClick={handleAddTeam} color="primary">
             Add Team

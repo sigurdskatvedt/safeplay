@@ -97,10 +97,8 @@ const CreateMatch = () => {
     event.preventDefault();
     if (!validateForm()) return;
 
-    // Combine date and time into a single date_time field
     const dateTime = `${formData.date.format('YYYY-MM-DD')}T${formData.time}:00`;
 
-    // Prepare the data to be sent to the backend
     const dataToSubmit = {
       team1: formData.team1,
       team2: formData.team2,
@@ -209,8 +207,8 @@ const CreateMatch = () => {
           label="Description"
           name="description"
           variant="outlined"
-          multiline  // Enable multiline
-          minRows={3} // Set minimum rows
+          multiline
+          minRows={3}
           value={formData.description}
           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
           error={!!validationErrors.description}
@@ -230,7 +228,7 @@ const CreateMatch = () => {
           >
             {fields.map((field) => (
               <MenuItem key={field.id} value={field.id}>
-                {field.name} {/* Assuming each field has an id and name */}
+                {field.name}
               </MenuItem>
             ))}
           </Select>

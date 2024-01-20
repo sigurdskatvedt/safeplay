@@ -4,7 +4,7 @@ import Link from "@mui/material/Link";
 import { useNavigate } from "react-router-dom";
 import { Stack } from "@mui/material";
 
-const Verified = (props) => {
+const Verified = () => {
   const navigate = useNavigate();
   return (
     <Container>

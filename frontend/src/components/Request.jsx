@@ -23,7 +23,6 @@ const ConsentRequestCard = ({ consentRequest, update, OpenSnackbar }) => {
     if (newApprovalStatus === "accepted") {
       console.log(age)
       if ((userType === "player" && age < 15)) {
-        // Show error or prevent change
         OpenSnackbar("Only guardians can approve consent requests for players under 15 years old.", "error");
         return;
       }
@@ -53,7 +52,7 @@ const ConsentRequestCard = ({ consentRequest, update, OpenSnackbar }) => {
     ConsentRequestsService.approveRequest({
       request_id: request_id,
     })
-      .then((response) => {
+      .then(() => {
         update();
         OpenSnackbar("Consent request approved", "success");
       })
@@ -75,7 +74,7 @@ const ConsentRequestCard = ({ consentRequest, update, OpenSnackbar }) => {
     ConsentRequestsService.removeApproval({
       request_id: request_id,
     })
-      .then((response) => {
+      .then(() => {
         update();
         OpenSnackbar("Approval removed", "success");
       })

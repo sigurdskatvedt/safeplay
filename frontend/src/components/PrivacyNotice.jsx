@@ -17,6 +17,7 @@ const PrivacyNotice = () => {
         setLoading(false);
       })
       .catch(err => {
+        console.log(err);
         setError('Could not fetch fields in use.');
         setLoading(false);
       });

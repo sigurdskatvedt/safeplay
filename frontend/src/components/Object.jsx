@@ -22,7 +22,7 @@ const Object = () => {
   };
 
 
-  const handleClose = (event, reason) => {
+  const handleClose = (_, reason) => {
     if (reason === "clickaway") {
       return;
     }
@@ -44,11 +44,9 @@ const Object = () => {
       formData.append('document', selectedFile);
     }
 
-    // Use the AddNewObjection service to send the data
     ObjectionsService.AddNewObjection(formData)
       .then(() => {
         OpenSnackbar('Objection submitted successfully!', 'success');
-        // Clear the form
         setObjectionText('');
         setSelectedFile(null);
       })

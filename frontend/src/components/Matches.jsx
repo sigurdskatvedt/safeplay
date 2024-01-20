@@ -10,7 +10,7 @@ import {
   TableRow,
   Paper,
 } from "@mui/material";
-import MatchesService from "../services/matches"; // Import the MatchesService
+import MatchesService from "../services/matches";
 
 const Matches = () => {
   const [upcomingMatches, setUpcomingMatches] = useState([]);

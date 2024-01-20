@@ -40,7 +40,7 @@ const NewRequest = React.forwardRef((props, ref) => {
       description: description,
     };
     HelpRequestService.CreateHelpRequest(data)
-      .then((response) => {
+      .then(() => {
         props.update();
         props.OpenSnackbar("Help Request created");
         props.handleClose();
