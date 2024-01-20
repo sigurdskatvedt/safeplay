@@ -6,7 +6,7 @@ class ConsentRequest(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='consent_requests')
     match = models.ForeignKey(
-        'matches.Match',  # Use the app_name.ModelName string format to avoid circular imports
+        'matches.Match',
         on_delete=models.CASCADE,
         related_name='consent_requests'
     )

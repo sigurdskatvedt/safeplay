@@ -1,5 +1,3 @@
-# backend/apps/consent_requests/views.py
-
 from datetime import date
 import pickle
 import base64
@@ -7,7 +5,6 @@ from rest_framework import viewsets, generics
 from rest_framework.permissions import IsAuthenticated
 from .models import ConsentRequest
 from .serializers import ConsentRequestSerializer
-from rest_framework.decorators import api_view, action
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.utils import timezone
@@ -41,24 +38,19 @@ class PastConsentRequestsView(APIView):
 
 
 class ApproveRequestView(generics.GenericAPIView):
-    """View for approving a consent request. Only POST method is allowed"""
     permission_classes = [IsAuthenticated]
-    # Instantiate the serializer with the updated object
 
     def post(self, request):
         user = request.user
-        # Calculate age of the user
         today = date.today()
         age = today.year - user.birthdate.year - \
             ((today.month, today.day) < (user.birthdate.month, user.birthdate.day))
 
         if not (user.user_type == 'guardian' or (user.user_type == 'player' and age > 15)):
             return Response({"error": "Only guardians or players over 15 years old can approve requests.", "error_code": "not_authorized"}, status=403)
-# check if id is provided
         if not (request.data.get('request_id')):
             return Response({'error': 'id is required'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # check if id is valid
         try:
             rId = base64.b64decode(request.data.get('request_id'))
             rId = pickle.loads(rId)
@@ -78,7 +70,6 @@ class ApproveRequestView(generics.GenericAPIView):
 
 
 class RemoveApprovalView(generics.GenericAPIView):
-    """View for removing approval of a consent request. Only POST method is allowed"""
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
@@ -87,7 +78,6 @@ class RemoveApprovalView(generics.GenericAPIView):
         if not (request.data.get('request_id')):
             return Response({'error': 'id is required'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # check if id is valid
         try:
             rId = base64.b64decode(request.data.get('request_id'))
             rId = pickle.loads(rId)

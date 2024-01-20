@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from rest_framework import permissions, viewsets, status, generics
+from rest_framework import viewsets, status, generics
 from apps.users.serializers import UserSerializer, RegisterSerializer, ResetPasswordSerializer, LoginSerializer, SendNewEmailSerializer,  SetNewPasswordSerializer, AssignTeamSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
@@ -14,13 +14,11 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.urls import reverse_lazy
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.encoding import force_bytes, force_str
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from rest_framework.decorators import action
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    """ViewSet for viewing and editing user instances"""
-
     serializer_class = UserSerializer
     permission_classes = (IsAuthenticated,)
 
@@ -48,10 +46,7 @@ class UserViewSet(viewsets.ModelViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
-
 class RegistrationViewSet(viewsets.ModelViewSet, TokenObtainPairView):
-    """ViewSet for registering new users"""
     serializer_class = RegisterSerializer
     permission_classes = (AllowAny,)
     http_method_names = ['post']
@@ -61,7 +56,6 @@ class RegistrationViewSet(viewsets.ModelViewSet, TokenObtainPairView):
 
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-        # Create refresh token for user using simplejwt
         refresh = RefreshToken.for_user(user)
         res = {
             "refresh": str(refresh),
@@ -76,10 +70,9 @@ class RegistrationViewSet(viewsets.ModelViewSet, TokenObtainPairView):
 
 
 class LoginViewSet(viewsets.ModelViewSet, TokenObtainPairView):
-    """ViewSet for logging in users. Extended from TokenObtainPairView"""
     serializer_class = LoginSerializer
     permission_classes = (AllowAny,)
-    http_method_names = ['post']  # Only allow POST requests
+    http_method_names = ['post']
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -93,9 +86,8 @@ class LoginViewSet(viewsets.ModelViewSet, TokenObtainPairView):
 
 
 class RefreshViewSet(viewsets.ViewSet, TokenRefreshView):
-    """ViewSet for refreshing tokens. Extended from TokenRefreshView"""
     permission_classes = (AllowAny,)
-    http_method_names = ['post']  # Only allow POST requests
+    http_method_names = ['post']
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -109,8 +101,6 @@ class RefreshViewSet(viewsets.ViewSet, TokenRefreshView):
 
 
 class VerificationView(generics.GenericAPIView):
-    """View for verifying user registration links"""
-
     def get(self, request, uid):
         verified_url = settings.URL + "/verified"
         invalid_url = settings.URL + "/invalid"
@@ -128,13 +118,10 @@ class VerificationView(generics.GenericAPIView):
         return redirect(invalid_url)
 
 
-
 class PasswordResetEmailView(generics.GenericAPIView):
-    """View for sending password reset email"""
     serializer_class = ResetPasswordSerializer
 
     def post(self, request):
-        # Check if email and username are provided
         if request.data.get("email") and request.data.get("username"):
             email = request.data["email"]
             username = request.data["username"]
@@ -144,7 +131,7 @@ class PasswordResetEmailView(generics.GenericAPIView):
 
                 uid = urlsafe_base64_encode(force_bytes(user.pk))
                 domain = get_current_site(request).domain
-                token = PasswordResetTokenGenerator().make_token(user)  # Generate token
+                token = PasswordResetTokenGenerator().make_token(user)
                 link = reverse_lazy(
                     'password-reset', kwargs={"uidb64": uid, "token": token})
 
@@ -173,7 +160,6 @@ class ActivationLinkEmailView(generics.GenericAPIView):
             user.save()
 
             if user.is_active != True:
-
                 email_subject = "Activate your account"
                 uid = urlsafe_base64_encode(user.username.encode())
                 domain = get_current_site(request).domain
@@ -193,8 +179,6 @@ class ActivationLinkEmailView(generics.GenericAPIView):
 
 
 class ResetPasswordView(generics.GenericAPIView):
-    """View for password reset redirect"""
-
     def get(self, request, uidb64, token):
 
         new_password_url = settings.URL + "/new_password"
@@ -215,7 +199,6 @@ class ResetPasswordView(generics.GenericAPIView):
 
 
 class SetNewPasswordView(generics.GenericAPIView):
-    """View for setting new password"""
     serializer_class = SetNewPasswordSerializer
 
     def post(self, request):

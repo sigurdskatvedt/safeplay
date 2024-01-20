@@ -1,5 +1,3 @@
-# backend/apps/matches/serializers.py
-
 from .models import Match, Team, ConsentRequest
 from rest_framework import serializers
 from apps.fields.serializers import BookingSerializer

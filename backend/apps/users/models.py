@@ -1,11 +1,7 @@
 from django.db import models
-
 from django.contrib.auth.models import AbstractUser
 from apps.teams.models import Team
-
 from django.utils import timezone
-import datetime
-
 
 
 class User(AbstractUser):

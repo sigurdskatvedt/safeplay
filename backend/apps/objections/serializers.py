@@ -10,26 +10,20 @@ class ObjectionSerializer(serializers.ModelSerializer):
         fields = ('id', 'document', "name", "text")
 
 class ObjectionPostSerializer(serializers.ModelSerializer):
-    """
-    Serializer for the upload Documents.
-    """
     class Meta:
         model = Objection
         fields = ('id', 'document', "name", "text")
 
 
 class ObjectionGetSerializer(serializers.ModelSerializer):
-    """
-    Serializer for the download of Documents.
-    """
-    link = serializers.SerializerMethodField()  # link to download the document
-    name = serializers.SerializerMethodField()  # name of the document
+    link = serializers.SerializerMethodField()
+    name = serializers.SerializerMethodField()
 
     class Meta:
         model = Objection
         fields = ('id', 'user', 'link', 'name')
 
-    def get_link(self, obj):  # get the link to download the document
+    def get_link(self, obj):
         domain = get_current_site(self.context["request"])
         link = reverse_lazy('document-download', kwargs={"pk": obj.id})
 
@@ -37,5 +31,4 @@ class ObjectionGetSerializer(serializers.ModelSerializer):
         return link
 
     def get_name(self, obj):
-        # name is stored as documents/id/filename, so splitting and selecting last item gets only the filename.
         return obj.document.name.split('/')[-1]

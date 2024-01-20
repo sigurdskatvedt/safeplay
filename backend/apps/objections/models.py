@@ -4,7 +4,6 @@ from .validators import FileValidator
 
 
 class Objection(models.Model):
-    # The document itself
     document = models.FileField(upload_to="objections", validators=[FileValidator(
         allowed_mimetypes='', allowed_extensions='', max_size=1024*1024*5)], blank=True, null=True)
 

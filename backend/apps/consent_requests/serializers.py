@@ -1,5 +1,3 @@
-# backend/apps/consent_requests/serializers.py
-
 from .models import ConsentRequest
 from apps.teams.models import Team
 from apps.matches.models import Match
@@ -29,8 +27,6 @@ class MatchSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ConsentRequestSerializer(serializers.ModelSerializer):
-    """ Serializer for consent requests"""
-    # This field will be used to identify the request. get_request_id() is used to encode the request id for this field
     match = MatchSerializer()
     user = UserSerializer()
 

@@ -1,4 +1,3 @@
-import datetime
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.settings import api_settings
@@ -11,10 +10,8 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse_lazy
 from django.conf import settings
-from .models import User, Team
-from rest_framework.exceptions import AuthenticationFailed
-from django.utils.encoding import force_bytes, force_str
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from .models import User
+from django.utils.encoding import force_str
 
 """Serializer for users"""
 
@@ -32,7 +29,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
         fields = ['id', 'username', 'email',
-              'team_id', 'first_name', 'last_name', 'user_type', 'guardian', 'birthdate']
+                  'team_id', 'first_name', 'last_name', 'user_type', 'guardian', 'birthdate']
         read_only_fields = ['id']
 
 
@@ -42,20 +39,16 @@ class LoginSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         data = super().validate(attrs)
 
-        # use get_token() from TokenObtainPairSerializer to get refresh token and access token
         refresh = self.get_token(self.user)
 
-        # add user data to response
         data['user'] = UserSerializer(self.user).data
-        # add refresh token to response
         data['refresh'] = str(refresh)
-        # add access token to response
         data['access'] = str(refresh.access_token)
 
         if api_settings.UPDATE_LAST_LOGIN:
             update_last_login(None, self.user)
 
-        return data  # return response
+        return data
 
 
 class RegisterSerializer(UserSerializer):
@@ -69,7 +62,7 @@ class RegisterSerializer(UserSerializer):
     first_name = serializers.CharField(max_length=30, required=True)
     last_name = serializers.CharField(max_length=30, required=True)
     user_type = serializers.ChoiceField(
-        choices=User.USER_TYPES, required=True)  # Add user_type field
+        choices=User.USER_TYPES, required=True)
     guardian_username = serializers.CharField(
         max_length=150, write_only=True, required=False)
 
@@ -81,10 +74,9 @@ class RegisterSerializer(UserSerializer):
     def create(self, validated_data):
         user = get_user_model().objects.create_user(**validated_data)
 
-        user.is_active = False  # set user to inactive until email is verified
+        user.is_active = False
         user.save()
 
-        # create email to send to user
         email = validated_data["email"]
         email_subject = "Activate your account"
         uid = urlsafe_base64_encode(user.username.encode())
@@ -104,9 +96,7 @@ class RegisterSerializer(UserSerializer):
 
     def validate(self, data):
 
-        # get the password from the data
         password = data.get('password')
-        # Custom validation for 'birthday' field based on 'user_type'
         user_type = data.get('user_type')
         guardian_username = data.get('guardian_username', None)
         birthdate = data.get('birthdate')
@@ -119,17 +109,15 @@ class RegisterSerializer(UserSerializer):
             try:
                 guardian = get_user_model().objects.get(username=guardian_username)
                 data['guardian'] = guardian
-                del data['guardian_username']  # Remove guardian_username from validated_data
+                del data['guardian_username']
             except get_user_model().DoesNotExist:
                 raise serializers.ValidationError(
                     {"guardian_username": "A user with this username does not exist."})
 
         errors = dict()
         try:
-            # validate the password and catch the exception
             validate_password(password=password)
 
-        # the exception raised here is different than serializers.ValidationError
         except exceptions.ValidationError as e:
             errors['password'] = list(e.messages)
 
@@ -179,21 +167,21 @@ class SetNewPasswordSerializer(serializers.Serializer):
         errorMessage = dict()
 
         try:
-            # validate password using django's validate_password
             validate_password(password)
         except exceptions.ValidationError as error:
             errorMessage['message'] = list(error.messages)
 
-        if errorMessage:  # if there is an error, raise it
+        if errorMessage:
             raise serializers.ValidationError(errorMessage)
 
-        if password != password1:  # check if passwords match
+        if password != password1:
             raise serializers.ValidationError("Passwords must match!")
 
-        user.set_password(password)  # set new password
+        user.set_password(password)
         user.save()
 
         return user
+
 
 class AssignTeamSerializer(serializers.ModelSerializer):
     team_id = serializers.IntegerField()
@@ -206,4 +194,3 @@ class AssignTeamSerializer(serializers.ModelSerializer):
         instance.team_id = validated_data['team_id']
         instance.save()
         return instance
-

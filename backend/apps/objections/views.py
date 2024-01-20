@@ -1,18 +1,13 @@
-from django.shortcuts import render
 from rest_framework import viewsets
 from .models import Objection
 from rest_framework.parsers import MultiPartParser, FormParser
 from .serializers import ObjectionGetSerializer, ObjectionPostSerializer
 from .permissions import ObjectionPermission
-from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework import status
 
 
-
-
 class ObjectionViewSet(viewsets.ModelViewSet):
-    """ViewSet for the Document model"""
 
     queryset = Objection.objects.all()
 
@@ -21,7 +16,6 @@ class ObjectionViewSet(viewsets.ModelViewSet):
 
     http_method_names = ['get', 'head', 'post', 'delete']
 
-    # Return different serializers for different actions
     def get_serializer_class(self):
         if self.action == 'create':
             return ObjectionPostSerializer
@@ -37,7 +31,7 @@ class ObjectionViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
     def get_queryset(self):
         return Objection.objects.filter(user=self.request.user)
 

@@ -9,4 +9,4 @@ class BookingSerializer(serializers.ModelSerializer):
 class FieldSerializer(serializers.ModelSerializer):
     class Meta:
         model = Field
-        fields = '__all__'  # Or list specific fields if you don't want to expose all
+        fields = '__all__'

@@ -1,5 +1,3 @@
-# backend/apps/matches/models.py
-
 from django.db import models
 from apps.teams.models import Team
 from apps.fields.models import Booking
@@ -17,7 +15,7 @@ class Match(models.Model):
         Booking, related_name='matches', on_delete=models.CASCADE)
 
     def save(self, *args, **kwargs):
-        is_new = not self.pk  # Check if this is a new match
+        is_new = not self.pk
         super().save(*args, **kwargs)
 
         if is_new:
