@@ -63,8 +63,12 @@ class ApproveRequestView(generics.GenericAPIView):
             rId = base64.b64decode(request.data.get('request_id'))
             rId = pickle.loads(rId)
 
-            consent_request = ConsentRequest.objects.raw(
-                "SELECT * FROM consent_requests_consentrequest WHERE id = %s", [rId])[0]
+            if (user.user_type == "guardian"):
+                consent_request = ConsentRequest.objects.get(
+                    id=rId, user__guardian=user)
+            else:
+                consent_request = ConsentRequest.objects.get(
+                    id=rId, user=user)
 
             consent_request.request_status = "accepted"
             consent_request.save()
@@ -87,8 +91,12 @@ class RemoveApprovalView(generics.GenericAPIView):
         try:
             rId = base64.b64decode(request.data.get('request_id'))
             rId = pickle.loads(rId)
-            consent_request = ConsentRequest.objects.raw(
-                "SELECT * FROM consent_requests_consentrequest WHERE id = %s", [rId])[0]
+            if (user.user_type == "guardian"):
+                consent_request = ConsentRequest.objects.get(
+                    id=rId, user__guardian=user)
+            else:
+                consent_request = ConsentRequest.objects.get(
+                    id=rId, user=user)
 
             consent_request.request_status = "declined"
             consent_request.save()
