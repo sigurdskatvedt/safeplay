@@ -2,12 +2,12 @@ import api from "./api";
 
 const FetchAvailableTimeSlots = (fieldId, date, timezone) => {
   const formattedDate = JSON.stringify(date).replace(/"/g, '');
-  const request = api.get(`field-bookings/${fieldId}/`, {
-    params: {
-      date: formattedDate,
-      timezone,
-    },
-  });
+  const requestData = {
+    field_id: fieldId,
+    date: formattedDate,
+    timezone: timezone,
+  };
+  const request = api.post('field-bookings/', requestData);
   return request.then((response) => response.data);
 };
 
